@@ -25,13 +25,17 @@ import java.util.Optional;
  * This prevents connection leaks and ensures efficient resource management.
  */
 public class DatabaseManager {
-    private static DatabaseManager instance;
+    private static volatile DatabaseManager instance = null;
     private final HikariDataSource dataSource;
 
     //private static final String URL = "jdbc:h2:mem:advising;DB_CLOSE_DELAY=-1";
-    private static final String URL = "jdbc:h2:file:./advising";
-    private static final String USER = "admin";
-    private static final String PASSWORD = "admin";
+
+    // --- Changed from original to utilize a mySQL server! ---
+    private static final String URL = "jdbc:mysql://localhost:3306/test_data"+
+            "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static final String USER = "test";
+    private static final String PASSWORD = "test";
+    // --------------------------------------------------------
 
     // Private constructor prevents instantiation from other classes
     private DatabaseManager() {
@@ -41,7 +45,7 @@ public class DatabaseManager {
         config.setJdbcUrl(URL);
         config.setUsername(USER);
         config.setPassword(PASSWORD);
-        config.setDriverClassName("org.h2.Driver");
+        config.setDriverClassName("com.mysql.cj.jdbc.Driver"); // -------- mySQL driver, changed from original!
         // Strings are set and final, so this is the one and only one database login, controlling the connection
         // Pool performance tuning
         config.setMaximumPoolSize(10);
@@ -50,14 +54,24 @@ public class DatabaseManager {
         // This looks like it sets up a caching service and sets it size, possibly for # of records to hang on to at once
 
         this.dataSource = new HikariDataSource(config);
-        initializeDatabase();
+
+        // commented out the initialize step as I made my own test database
+        // initializeDatabase();
         System.out.println("Database connection pool established");
     }
 
     // Thread-safe singleton instance retrieval
-    public static synchronized DatabaseManager getInstance() {
+    // Added double-checked locking
+    public static DatabaseManager getInstance() {
         if (instance == null) {
-            instance = new DatabaseManager();
+
+            synchronized (DatabaseManager.class)
+            {
+                // check again as multiple threads can reach above step
+                if (instance == null)
+                    instance = new DatabaseManager();
+            }
+
         }
         return instance;
     }
@@ -604,12 +618,14 @@ public class DatabaseManager {
      * Initialize complete database schema for all 14 weeks - 2 Exam weeks.
      */
     private void initializeDatabase() {
+
         try {
             System.out.println("Initializing database schema...");
 
             // ================================================================
             // WEEK 1 & 2: Core User Tables (Singleton, Factory)
-            // ================================================================
+            // ===============================================================
+            //
 
             executeUpdate("CREATE TABLE IF NOT EXISTS users (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -1128,7 +1144,9 @@ public class DatabaseManager {
         } catch (SQLException e) {
             throw new RuntimeException("Error initializing database schema", e);
         }
+
     }
+
 
     /**
      * Insert default/seed data for testing
