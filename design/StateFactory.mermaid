@@ -1,0 +1,236 @@
+---
+title: "State Factory design"
+---
+
+classDiagram
+    class StateFactory{
+        -StateFactory() : void
+        +enrollmentStateFor(String) : State
+        +transcriptStateFor(String) : State
+        +permissionStateFor(String) : State
+        +registrationStateFor(String) : State
+        +waitlistStateFor(String) : State
+        +load() : void
+    }
+
+    class State{
+        <<Interface>>
+    }
+
+    class EnrollmentState{
+        <<Interface>>
+    }
+
+    class PermissionState{
+        <<Interface>>
+    }
+
+    class RegistrationState{
+        <<Interface>>
+    }
+
+    class TranscriptState{
+        <<Interface>>
+    }
+
+    class WaitlistState{
+        <<Interface>>
+    }
+
+    class EnrollmentContext{
+        -EnrollmentState
+        +load(String) : EnrollmentContext
+        +updateState(EnrollmentState) : void
+        +getState() : EnrollmentState
+    }
+
+    class PermissionContext{
+        -PermissionState
+        +load(String) : PermissionContext
+        +updateState(PermissionState) : void
+        +getState() : PermissionState
+    }
+
+    class RegistrationContext{
+        -RegistrationState
+        +load(String) : RegistrationContext
+        +updateState(RegistrationState) : void
+        +getState() : RegistrationState
+    }
+
+    class TranscriptContext{
+        -TranscriptState
+        +load(String) : TranscriptContext
+        +updateState(TranscriptState) : void
+        +getState() : TranscriptState
+    }
+
+    class WaitlistContext{
+        -WaitlistState
+        +load(String) : WaitlistContext
+        +updateState(WaitlistState) : void
+        +getState() : WaitlistState
+    }
+
+    class Completed{
+        -Completed
+        +getInstance() : Completed
+    }
+
+    class Dropped{
+        -Dropped
+        +getInstance() : Dropped
+    }
+
+    class Enrolled{
+        -Enrolled
+        +getInstance() : Enrolled
+    }
+
+    class Waitlisted{
+        -Waitlisted
+        +getInstance() : Waitlisted
+    }
+
+    class WithdrawnE{
+        -WithdrawnE
+        +getInstance() : WithdrawnE
+    }
+
+    class Denied{
+        -Denied
+        +getInstance() : Denied
+    }
+
+    class Granted{
+        -Granted
+        +getInstance() : Granted
+    }
+
+    class NotRequested{
+        -NotRequested
+        +getInstance() : NotRequested
+    }
+
+    class Pending{
+        -Pending
+        +getInstance() : Pending
+    }
+
+    class AddDrop{
+        -AddDrop
+        +getInstance() : AddDrop
+    }
+
+    class Closed{
+        -Closed
+        +getInstance() : Closed
+    }
+
+    class OpenEnrollment{
+        -OpenEnrollment
+        +getInstance() : OpenEnrollment
+    }
+
+    class PriorityOpen{
+        -PriorityOpen
+        +getInstance() : PriorityOpen
+    }
+
+    class AcademicDisqualification{
+        -AcademicDisqualification
+        +getInstance() : AcademicDisqualification
+    }
+
+    class Dismissed{
+        -Dismissed
+        +getInstance() : Dismissed
+    }
+
+    class GoodStanding{
+        -GoodStanding
+        +getInstance() : GoodStanding
+    }
+
+    class Graduated{
+        -Graduated
+        +getInstance() : Graduated
+    }
+
+    class Probation{
+        -Probation
+        +getInstance() : Probation
+    }
+
+    class WithdrawnT{
+        -WithdrawnT
+        +getInstance() : WithdrawnT
+    }
+
+    class Expired{
+        -Expired
+        +getInstance() : Expired
+    }
+
+    class Fulfilled{
+        -Fulfilled
+        +getInstance() : Fulfilled
+    }
+
+    class Promoted{
+        -Promoted
+        +getInstance() : Promoted
+    }
+
+    class Removed{
+        -Removed
+        +getInstance() : Removed
+    }
+
+    class Waiting{
+        -Waiting
+        +getInstance() : Waiting
+    }
+
+    EnrollmentState --|> State : extends
+    Completed --|> EnrollmentState : implements
+    Dropped --|> EnrollmentState : implements
+    Enrolled --|> EnrollmentState : implements
+    Waitlisted --|> EnrollmentState : implements
+    WithdrawnE --|> EnrollmentState : implements
+
+    PermissionState --|> State : extends
+    Denied --|> PermissionState : implements
+    Granted --|> PermissionState : implements
+    NotRequested --|> PermissionState : implements
+    Pending --|> PermissionState : implements
+
+    RegistrationState --|> State : extends
+    AddDrop --|> RegistrationState : implements
+    Closed --|> RegistrationState : implements
+    OpenEnrollment --|> RegistrationState : implements
+    PriorityOpen --|> RegistrationState : implements
+
+    TranscriptState --|> State : extends
+    AcademicDisqualification --|> TranscriptState : implements
+    Dismissed --|> TranscriptState : implements
+    GoodStanding --|> TranscriptState : implements
+    Graduated --|> TranscriptState : implements
+    Probation --|> TranscriptState : implements
+    WithdrawnT --|> TranscriptState : implements
+
+    WaitlistState --|> State : extends
+    Expired --|> WaitlistState : implements
+    Fulfilled --|> WaitlistState : implements
+    Promoted --|> WaitlistState : implements
+    Removed --|> WaitlistState : implements
+    Waiting --|> WaitlistState : implements
+
+
+
+    EnrollmentContext *-- EnrollmentState : contains
+    PermissionContext *-- PermissionState : contains
+    RegistrationContext *-- RegistrationState : contains
+    TranscriptContext *-- TranscriptState : contains
+    WaitlistContext *-- WaitlistState : contains
+
