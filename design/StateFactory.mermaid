@@ -226,11 +226,41 @@ classDiagram
     Removed --|> WaitlistState : implements
     Waiting --|> WaitlistState : implements
 
-
-
     EnrollmentContext *-- EnrollmentState : contains
     PermissionContext *-- PermissionState : contains
     RegistrationContext *-- RegistrationState : contains
     TranscriptContext *-- TranscriptState : contains
     WaitlistContext *-- WaitlistState : contains
+
+    StateFactory --* Completed : creates
+    StateFactory --* Dropped : creates
+    StateFactory --* Enrolled : creates
+    StateFactory --* Waitlisted : creates
+    StateFactory --* WithdrawnE : creates
+    StateFactory --* PermissionState : creates
+    StateFactory --* Denied : creates
+    StateFactory --* Granted : creates
+    StateFactory --* NotRequested : creates
+    StateFactory --* Pending : creates
+    StateFactory --* RegistrationState : creates
+    StateFactory --* AddDrop : creates
+    StateFactory --* Closed : creates
+    StateFactory --* OpenEnrollment : creates
+    StateFactory --* PriorityOpen : creates
+    StateFactory --* TranscriptState : creates
+    StateFactory --* AcademicDisqualification : creates
+    StateFactory --* Dismissed : creates
+    StateFactory --* GoodStanding : creates
+    StateFactory --* Graduated : creates
+    StateFactory --* Probation : creates
+    StateFactory --* WithdrawnT : creates
+    StateFactory --* WaitlistState : creates
+    StateFactory --* Expired : creates
+    StateFactory --* Fulfilled : creates
+    StateFactory --* Promoted : creates
+    StateFactory --* Removed : creates
+    StateFactory --* Waiting : creates
+
+
+
 
