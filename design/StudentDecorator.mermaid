@@ -1,0 +1,155 @@
+classDiagram
+
+    class User {
+        - int id
+        - String username
+        - String password
+        - String userType
+        - String email
+        - String firstName
+        - String lastName
+        - boolean isActive
+        - LocalDateTime lastLogin
+        - String phone
+        - LocalDateTime updatedAt
+
+        + User(username: String, password: String, email: String, firstName: String, lastName: String)
+        + displayInfo(): void
+        + showDashboard(): void
+
+        + getId(): int
+        + getUsername(): String
+        + getEmail(): String
+        + getUserType(): String
+        + getPassword(): String
+        + getFirstName(): String
+        + getLastName(): String
+        + isActive(): boolean
+        + getLastLogin(): LocalDateTime
+        + getPhone(): String
+        + getUpdatedAt(): LocalDateTime
+        + getFullName(): String
+
+        + setId(id: int): void
+        + setFirstName(firstName: String): void
+        + setLastName(lastName: String): void
+        + setEmail(email: String): void
+        + setUserType(userType: String): void
+        + setActive(isActive: boolean): void
+        + setLastLogin(lastLogin: LocalDateTime): void
+        + setPhone(phone: String): void
+        + setUpdatedAt(ts: LocalDateTime): void
+    }
+
+    class Student {
+        - String studentId
+        - BigDecimal gpa
+        - String enrollmentStatus
+        - String academicStanding
+        - String classification
+        - String major
+        - String minor
+        - int advisorId
+        - List~Section~ sections
+        - List~WaitlistEntry~ waitlist
+
+        + Student()
+        + Student(username: String, password: String, email: String, firstName: String, lastName: String, studentId: String)
+
+        + showDashboard(): void
+        # ensureId(): void
+
+        + getStudentId(): String
+        + getGpa(): BigDecimal
+        + setGpa(gpa: BigDecimal): void
+
+        + getEnrollmentStatus(): String
+        + setEnrollmentStatus(enrollmentStatus: String): void
+
+        + getAcademicStanding(): String
+        + setAcademicStanding(academicStanding: String): void
+
+        + getClassification(): String
+        + setClassification(classification: String): void
+
+        + getMajor(): String
+        + setMajor(major: String): void
+
+        + getMinor(): String
+        + setMinor(minor: String): void
+
+        + getAdvisorId(): int
+        + setAdvisorId(advisorId: int): void
+
+        + getSections(): List~Section~
+        + setSections(sections: List~Section~): void
+
+        + getWaitlist(): List~WaitlistEntry~
+        + setWaitlist(waitlist: List~WaitlistEntry~): void
+    }
+
+    class Faculty {
+        - String employeeId
+        - String department
+        - String title
+        - String officeLocation
+        - String officeHours
+        - LocalDate hireDate
+        - List~Section~ sections
+
+        + Faculty()
+        + Faculty(username: String, password: String, email: String, firstName: String, lastName: String, employeeId: String, department: String)
+
+        + showDashboard(): void
+
+        + getEmployeeId(): String
+        + setEmployeeId(employeeId: String): void
+
+        + getDepartment(): String
+        + setDepartment(department: String): void
+
+        + getTitle(): String
+        + setTitle(title: String): void
+
+        + getOfficeLocation(): String
+        + setOfficeLocation(officeLocation: String): void
+
+        + getOfficeHours(): String
+        + setOfficeHours(officeHours: String): void
+
+        + getHireDate(): LocalDate
+        + setHireDate(hireDate: LocalDate): void
+
+        + getSections(): List~Section~
+        + setSections(sections: List~Section~): void
+    }
+
+    class PermissionDecorator {
+        - User user
+        + PermissionDecorator(user: User)
+    }
+
+    class CanRegisterCourses
+    class CanViewGrades
+    class CanMakePayment
+    class CanViewTranscript
+    class CanViewClassRoster
+    class CanEnterGrades
+    class CanDropStudents
+    class CanPriorityRegistration
+    class CanOverloadCredits
+
+    Student --|> User : extends
+    Faculty --|> User : extends
+
+    PermissionDecorator *-- User : contains
+
+    PermissionDecorator <|-- CanRegisterCourses : extends
+    PermissionDecorator <|-- CanViewGrades : extends
+    PermissionDecorator <|-- CanMakePayment : extends
+    PermissionDecorator <|-- CanViewTranscript : extends
+    PermissionDecorator <|-- CanViewClassRoster : extends
+    PermissionDecorator <|-- CanEnterGrades : extends
+    PermissionDecorator <|-- CanDropStudents : extends
+    PermissionDecorator <|-- CanPriorityRegistration : extends
+    PermissionDecorator <|-- CanOverloadCredits : extends
