@@ -1,0 +1,63 @@
+---
+title: "State Pattern - Web and JavaFX View Navigation State Machine"
+---
+classDiagram
+    class ViewContext{
+        -List~State~ undo
+        -List~State~ redo
+        -ViewState currentState
+        +void setCommand()
+        +State getCurrentState()
+        +void navigateTo(ViewState)
+        +void execute()
+        +void logout()
+    }
+    class State {
+        <<Interface>>
+        +void handleAction()
+    }
+
+    class ViewState {
+        <<Interface>>
+        -Boolean requiresAuthentication()
+        +void handleAction()
+    }
+
+    class GuestViewState {
+        -void GuestViewState()
+        +void handleAction()
+    }
+
+    class RegistrationViewState {
+        -void RegistrationViewState()
+        +void handleAction()
+    }
+
+    class TranscriptViewState {
+        -void TranscriptViewState()
+        +void handleAction()
+    }
+
+    class PermissionManagementViewState {
+        -void PermissionManagementViewState()
+        +void handleAction()
+    }
+
+    class StudentDashboardViewState {
+        -void StudentDashboardViewState()
+        +void handleAction()
+    }
+
+    class FacultyDashboardViewState {
+        -void FacultyDashboardViewState()
+        +void handleAction()
+    }
+
+    ViewContext *-- State : Contains
+    State <|-- ViewState : Implements
+    ViewState <|-- GuestViewState : Implements
+    ViewState <|-- RegistrationViewState : Implements
+    ViewState <|-- TranscriptViewState : Implements
+    ViewState <|-- PermissionManagementViewState : Implements
+    ViewState <|-- StudentDashboardViewState : Implements
+    ViewState <|-- FacultyDashboardViewState : Implements
