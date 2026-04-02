@@ -7,14 +7,13 @@ classDiagram
         -List~State~ redo
         -ViewState currentState
         +void setCommand()
-        +State getCurrentState()
+        +ViewState getCurrentState()
         +void navigateTo(ViewState)
         +void execute()
         +void logout()
     }
     class State {
         <<Interface>>
-        +void handleAction()
     }
 
     class ViewState {
@@ -53,6 +52,11 @@ classDiagram
         +void handleAction()
     }
 
+    class AdminDashboardViewState {
+        -void FacultyDashboardViewState()
+        +void handleAction()
+    }
+
     ViewContext *-- State : Contains
     State <|-- ViewState : Implements
     ViewState <|-- GuestViewState : Implements
@@ -61,3 +65,4 @@ classDiagram
     ViewState <|-- PermissionManagementViewState : Implements
     ViewState <|-- StudentDashboardViewState : Implements
     ViewState <|-- FacultyDashboardViewState : Implements
+    ViewState <|-- AdminDashboardViewState : Implements
