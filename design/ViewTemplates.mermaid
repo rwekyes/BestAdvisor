@@ -1,0 +1,96 @@
+---
+title: "Views with the Template Method"
+---
+classDiagram
+    class ViewRender{
+        <<interface>>
+        +viewTemplate() : String
+        +preRender() : void
+        +headerRender() : String
+        +bodyRender() : String
+        +footerRender() : String
+        +postRender() : void
+    }
+
+    class ViewUnofficialTranscript{
+        +preRender() : void
+        +headerRender() : String
+        +bodyRender() : String
+        +footerRender() : String
+        +postRender() : void
+    }
+
+    class ViewOfficialTranscript{
+        +preRender() : void
+        +headerRender() : String
+        +bodyRender() : String
+        +footerRender() : String
+        +postRender() : void
+    }
+
+    class ViewStudentFinanceSummary{
+        +preRender() : void
+        +headerRender() : String
+        +bodyRender() : String
+        +footerRender() : String
+        +postRender() : void
+    }
+
+    class ViewStudentTaxDocument{
+        +preRender() : void
+        +headerRender() : String
+        +bodyRender() : String
+        +footerRender() : String
+        +postRender() : void
+    }
+
+    class ViewPaymentReceipt{
+        +preRender() : void
+        +headerRender() : String
+        +bodyRender() : String
+        +footerRender() : String
+        +postRender() : void
+    }
+
+    class ViewClassRoster{
+        +preRender() : void
+        +headerRender() : String
+        +bodyRender() : String
+        +footerRender() : String
+        +postRender() : void
+    }
+
+    class ViewCensusRoster{
+        +preRender() : void
+        +headerRender() : String
+        +bodyRender() : String
+        +footerRender() : String
+        +postRender() : void
+    }
+
+    class ViewGradebookRoster{
+        +preRender() : void
+        +headerRender() : String
+        +bodyRender() : String
+        +footerRender() : String
+        +postRender() : void
+    }
+
+    class ViewBudgetSummary{
+        +preRender() : void
+        +headerRender() : String
+        +bodyRender() : String
+        +footerRender() : String
+        +postRender() : void
+    }
+
+    ViewRender <|-- ViewBudgetSummary : Implements
+    ViewRender <|-- ViewUnofficialTranscript : Implements
+    ViewRender <|-- ViewOfficialTranscript : Implements
+    ViewRender <|-- ViewStudentFinanceSummary : Implements
+    ViewRender <|-- ViewStudentTaxDocument : Implements
+    ViewRender <|-- ViewClassRoster : Implements
+    ViewRender <|-- ViewCensusRoster : Implements
+    ViewRender <|-- ViewGradebookRoster : Implements
+    ViewRender <|-- ViewPaymentReceipt : Implements
+
