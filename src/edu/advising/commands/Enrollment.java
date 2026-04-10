@@ -46,7 +46,7 @@ public class Enrollment {
     public Enrollment(int studentId, int sectionId) {
         this.studentId = studentId;
         this.sectionId = sectionId;
-        this.status = "ENROLLED";
+        this.status = "PENDING";
     }
 
     public int getId() {

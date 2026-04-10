@@ -2,6 +2,7 @@ package edu.advising.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.advising.contexts.EnrollmentContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
 import edu.advising.notifications.ObservableStudent;
@@ -45,25 +46,32 @@ public class DropCommand extends BaseCommand {
     @Override
     public void execute() {
         executionTime = LocalDateTime.now();
+        try {
+            Enrollment enrollment = getEnrollment();
+            if (enrollment == null) {
+                successful   = false;
+                errorMessage = String.format("Drop failed — student not enrolled in %s",
+                        section.getCourseCode());
+                System.out.println("✗ " + errorMessage);
+                return;
+            }
+            this.previousEnrollmentId = enrollment.getId();
+            EnrollmentContext enrollmentContext = EnrollmentContext.load(enrollment, student, section);
+            // TODO: Figure out where the heck the dropReason String comes from
+            enrollmentContext.drop("dropReason"); // ENROLLED → DROPPED, persists, notifies
 
-        if (section.drop(student)) {
-            // Update database
-            updateEnrollmentStatus("DROPPED");
-
-            executed = true;
+            executed   = true;
             successful = true;
-
             System.out.printf("✓ Student %s dropped %s%n",
                     student.getStudentId(), section.getCourseCode());
 
-            // Check waitlist and promote next student
             try {
                 promoteFromWaitlist();
             } catch (SQLException | IllegalAccessException e) {
                 e.printStackTrace();
                 System.out.println("Failed to promote from waitlist.");
             }
-        } else {
+        } catch (SQLException e) {
             successful   = false;
             errorMessage = String.format("Drop failed — student not enrolled in %s",
                     section.getCourseCode());
@@ -77,8 +85,21 @@ public class DropCommand extends BaseCommand {
             System.out.println("Cannot undo - command not executed or failed");
             return;
         }
+        try {
+            Enrollment enrollment = getEnrollment();
+            EnrollmentContext enrollmentContext = EnrollmentContext.load(enrollment, student, section);
+            enrollmentContext.reenroll();
+            System.out.printf("↶ Undone: Drop of %s - student re-enrolled%n",
+                    section.getCourseCode());
+            this.undoneAt = LocalDateTime.now();
+            this.isUndone = true;
+        } catch (SQLException e){
+            e.printStackTrace();
+            System.out.println("Undo failed");
+        }
 
-        // Re-enroll
+        // Old Re-enroll code - responsibility changed to EnrollmentContext
+        /*
         if (section.enroll(student) > 0) {
             updateEnrollmentStatus("ENROLLED");
             System.out.printf("↶ Undone: Drop of %s - student re-enrolled%n",
@@ -86,6 +107,8 @@ public class DropCommand extends BaseCommand {
             this.undoneAt = LocalDateTime.now();
             this.isUndone = true;
         }
+        */
+
     }
 
     @Override
@@ -98,6 +121,8 @@ public class DropCommand extends BaseCommand {
         return String.format("Drop %s (%s)", section.getCourseCode(), section.getCourseName());
     }
 
+    // Below is commented out, can be removed as the enrollmentContext now handles this
+    /*
     private void updateEnrollmentStatus(String status) {
         // Section.drop() already updates the enrollment via ORM upsert.
         // This method exists as a safety net for direct DropCommand use outside Section.
@@ -110,6 +135,8 @@ public class DropCommand extends BaseCommand {
         }
     }
 
+     */
+
     private void promoteFromWaitlist() throws SQLException, IllegalAccessException {
         if (!section.getWaitlist().isEmpty() && section.hasCapacity()) {
             // Get the next waitlist entry
@@ -118,10 +145,15 @@ public class DropCommand extends BaseCommand {
             Student student = nextWaitlistEntry.getStudent();
             // Remove that student from the waitlist
             section.removeFromWaitlist(student);
-            section.enroll(student);
+
+            // Below is commented out, can be removed as the enrollmentContext now handles this
+            // section.enroll(student);
+
+            EnrollmentContext enrollmentContext = EnrollmentContext.create(student, section);
+            enrollmentContext.confirm();
             System.out.println(String.format("↑ Student ID %s promoted from waitlist", student.getStudentId()));
 
-            // In real implementation, notify the student with observer!!!
+            // TODO: In real implementation, notify the student with observer!!!
         }
     }
 
@@ -156,5 +188,20 @@ public class DropCommand extends BaseCommand {
         } catch (JsonProcessingException | SQLException e) {
             throw new RuntimeException("Failed to deserialize DropCommand data", e);
         }
+    }
+
+    private Enrollment getEnrollment() throws SQLException {
+        String sql = "SELECT * FROM enrollments WHERE student_id = ? AND section_id = ? AND status = 'ENROLLED'";
+        return dbManager.fetch(sql, rs -> {
+            Enrollment e = new Enrollment();
+            e.setId(rs.getInt("id"));
+            e.setStudentId(rs.getInt("student_id"));
+            e.setSectionId(rs.getInt("section_id"));
+            e.setStatus(rs.getString("status"));
+            e.setDropReason(rs.getString("drop_reason"));
+            e.setFinalGrade(rs.getString("final_grade"));
+            // add gradedAt if you need it
+            return e;
+        }, student.getId(), section.getId());
     }
 }

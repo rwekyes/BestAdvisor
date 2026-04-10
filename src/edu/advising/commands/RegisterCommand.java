@@ -1,6 +1,7 @@
 package edu.advising.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import edu.advising.contexts.EnrollmentContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
 import edu.advising.notifications.NotificationManager;
@@ -56,13 +57,18 @@ public class RegisterCommand extends BaseCommand {
             return;
         }
 
-        if ((this.enrollmentId = section.enroll(student)) > 0) {
-            executed    = true;
-            successful  = true;
+        try {
+            EnrollmentContext enrollmentContext = EnrollmentContext.create(student, section);
+            this.enrollmentId = enrollmentContext.getEnrollment().getId();
+            enrollmentContext.confirm(); // PENDING → ENROLLED, persists, notifies
+            executed   = true;
+            successful = true;
             System.out.printf("✓ Student %s registered for %s%n",
                     student.getStudentId(), section.getCourseCode());
-            notificationManager.notifyRegistration(student, section.getCourseCode(), true);
-        } else {
+            // Line below is commented out to meet acceptance criteria for Enrollment State machine,
+            // notification should happen in enrollmentContext.confirm()
+            // notificationManager.notifyRegistration(student, section.getCourseCode(), true);
+        } catch (SQLException | IllegalAccessException e) {
             successful   = false;
             errorMessage = "Already enrolled or duplicate registration prevented.";
         }

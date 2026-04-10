@@ -85,6 +85,10 @@ public class NotificationManager implements Subject {
         notifyObservers(notification);
     }
 
+    public void notifyEnrollmentUpdate(Student student, String courseCode, String newStatus) {
+        //TODO: — wire up fully later
+    }
+
     public void notifyRegistration(Student student, String courseCode, boolean success) {
         String message = success
                 ? String.format("Successfully registered for %s", courseCode)

@@ -14,7 +14,7 @@ public class StudentDashboardViewState implements ViewState {
 
     @Override
     public void handleAction(ViewContext viewContext, String login, String jsmith, String s, String string) {
-        System.out.println("Error - Student View handleAction call contains no parameters");
+        System.out.println("Error - Student View handleAction call contains too many parameters");
     }
 
     public void handleAction() {
