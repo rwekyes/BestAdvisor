@@ -12,84 +12,85 @@ public class StateFactory {
 
     }
 
-    public static State transcriptStateFor(String s) {
+    public static TranscriptState transcriptStateFor(String s) {
         if (s == null) {
-            return GoodStanding.getInstance();
+            return GoodStandingTranscriptState.getInstance();
         }
 
         return switch (s) {
-            case "ACADEMIC_DISQUALIFICATION" -> AcademicDisqualification.getInstance();
-            case "DISMISSED" -> Dismissed.getInstance();
-            case "GOOD_STANDING" -> GoodStanding.getInstance();
-            case "GRADUATED" -> Graduated.getInstance();
-            case "PROBATION" -> Probation.getInstance();
-            case "WITHDRAWN" -> WithdrawnT.getInstance();
+            case "ACADEMIC_DISQUALIFICATION" -> AcademicDisqualificationTranscriptState.getInstance();
+            case "DISMISSED" -> DismissedTranscriptState.getInstance();
+            case "GOOD_STANDING" -> GoodStandingTranscriptState.getInstance();
+            case "GRADUATED" -> GraduatedTranscriptState.getInstance();
+            case "PROBATION" -> ProbationTranscriptState.getInstance();
+            case "WITHDRAWN" -> WithdrawnTranscriptState.getInstance();
             default -> throw new IllegalArgumentException(
                     "Unknown Transcript Status - " + s + " - "
             );
         };
     }
 
-    public static State enrollmentStateFor(String s) {
+    public static EnrollmentState enrollmentStateFor(String s) {
         if (s == null) {
-            return Enrolled.getInstance();
+            return EnrolledEnrollmentState.getInstance();
         }
 
         return switch (s) {
-            case "COMPLETED" -> Completed.getInstance();
-            case "DROPPED" -> Dropped.getInstance();
-            case "ENROLLED" -> Enrolled.getInstance();
-            case "WAITLISTED" -> Waitlisted.getInstance();
-            case "WITHDRAWN" -> WithdrawnE.getInstance();
+            case "PENDING" -> PendingEnrollmentState.getInstance();
+            case "COMPLETED" -> CompletedEnrollmentState.getInstance();
+            case "DROPPED" -> DroppedEnrollmentState.getInstance();
+            case "ENROLLED" -> EnrolledEnrollmentState.getInstance();
+            case "WAITLISTED" -> WaitlistedEnrollmentState.getInstance();
+            case "WITHDRAWN" -> WithdrawnEnrollmentState.getInstance();
             default -> throw new IllegalArgumentException(
                     "Unknown Enrollment Status - " + s + " - "
             );
         };
     }
 
-    public static State waitlistStateFor(String s) {
+    public static WaitlistState waitlistStateFor(String s) {
         if (s == null) {
-            return Waiting.getInstance();
+            return WaitingWaitlistState.getInstance();
         }
 
         return switch (s) {
-            case "EXPIRED" -> Expired.getInstance();
-            case "FULFILLED" -> Fulfilled.getInstance();
-            case "PROMOTED" -> Promoted.getInstance();
-            case "REMOVED" -> Removed.getInstance();
-            case "WAITING" -> Waiting.getInstance();
+            case "EXPIRED" -> ExpiredWaitlistState.getInstance();
+            case "FULFILLED" -> FulfilledWaitlistState.getInstance();
+            case "PROMOTED" -> PromotedWaitlistState.getInstance();
+            case "REMOVED" -> RemovedWaitlistState.getInstance();
+            case "WAITING" -> WaitingWaitlistState.getInstance();
             default -> throw new IllegalArgumentException(
                     "Unknown Waitlist Status - " + s + " - "
             );
         };
     }
 
-    public static State registrationStateFor(String s) {
+    public static RegistrationState registrationStateFor(String s) {
         if (s == null) {
-            return OpenEnrollment.getInstance();
+            return OpenEnrollmentRegistrationState.getInstance();
         }
 
         return switch (s) {
-            case "ADD_DROP" -> AddDrop.getInstance();
-            case "CLOSED" -> Closed.getInstance();
-            case "OPEN_ENROLLMENT" -> OpenEnrollment.getInstance();
-            case "PRIORITY_OPEN" -> PriorityOpen.getInstance();
+            case "ADD_DROP" -> AddDropRegistrationState.getInstance();
+            case "CLOSED" -> ClosedRegistrationState.getInstance();
+            case "OPEN_ENROLLMENT" -> OpenEnrollmentRegistrationState.getInstance();
+            case "PRIORITY_OPEN" -> PriorityOpenRegistrationState.getInstance();
             default -> throw new IllegalArgumentException(
                     "Unknown Registration Status - " + s + " - "
             );
         };
     }
 
-    public static State permissionStateFor(String s) {
+    public static PermissionState permissionStateFor(String s) {
         if (s == null) {
-            return NotRequested.getInstance();
+            return NotRequestedPermissionState.getInstance();
         }
 
         return switch (s) {
-            case "DENIED" -> Denied.getInstance();
-            case "GRANTED" -> Granted.getInstance();
-            case "NOT_REQUESTED" -> NotRequested.getInstance();
-            case "PENDING" -> Pending.getInstance();
+            case "DENIED" -> DeniedPermissionState.getInstance();
+            case "GRANTED" -> GrantedPermissionState.getInstance();
+            case "NOT_REQUESTED" -> NotRequestedPermissionState.getInstance();
+            case "PENDING" -> PendingPermissionState.getInstance();
             default -> throw new IllegalArgumentException(
                     "Unknown Permission Status - " + s + " - "
             );

@@ -245,9 +245,10 @@ public class Section {
     public String getCourseCode() {
         try {
             Course course = this.getCourse();
-            return course.getCode() + "-" + semester + year + "-" + sectionNumber; // CIS12-SP26-2
+            if (course == null) return "UNKNOWN-" + semester + year + "-" + sectionNumber;
+            return course.getCode() + "-" + semester + year + "-" + sectionNumber;
         } catch (SQLException e) { }
-        return "UNKNOWN-" + semester + year + "-" + sectionNumber; // UNKNOWN-SP26-2
+        return "UNKNOWN-" + semester + year + "-" + sectionNumber;
     }
 
     public int getCourseId() {
