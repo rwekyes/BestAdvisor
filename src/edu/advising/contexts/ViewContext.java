@@ -7,6 +7,7 @@ import edu.advising.commands.CommandExecutor;
 import edu.advising.states.ViewState;
 import edu.advising.states.viewstates.GuestViewState;
 import edu.advising.states.viewstates.RegistrationViewState;
+import edu.advising.users.User;
 
 import java.util.ArrayList;
 
@@ -18,6 +19,7 @@ public class ViewContext {
     private FacultyPermissionContext facultyPermissionContext;
     private RegistrationPeriodContext registrationPeriodContext;
     private CommandExecutor commandExecutor;
+    private User currentUser;
 
     public ViewContext(){
         this.authContext = new AuthenticationContext(new BasicAuthentication());
@@ -37,17 +39,17 @@ public class ViewContext {
         return currentState;
     }
 
-    // TODO: set up the verification logic
     public void navigateTo(ViewState s){
-        if(s.requiresAuthentication() && !authContext.verify("","").isFullyAuthenticated()){
+        if(s.requiresAuthentication() && currentUser == null){
             System.out.println("Error - Unauthorized Access Attempt!");
             logout();
-        } else { // TODO: maybe a login here? maybe not
-            currentState.exit(this);
-            undo.add(currentState);
-            s.enter(this);
-            s.render(this);
+            return;
         }
+        currentState.exit(this);
+        undo.add(currentState);
+        currentState = s;
+        s.enter(this);
+        s.render(this);
     }
 
     public void execute(){
@@ -57,16 +59,23 @@ public class ViewContext {
     public void logout(){
         undo.removeAll(undo);
         redo.removeAll(redo);
+        currentUser = null;
         authContext.logout();
         currentState.exit(this);
         currentState = GuestViewState.getInstance();
     }
 
     public void back(){
-        redo.add(currentState);
+
         currentState.exit(this);
-        currentState = undo.getLast();
-        undo.remove(undo.getLast());
+        if(undo.isEmpty()){
+            currentState = GuestViewState.getInstance();
+        }
+        else {
+            redo.add(currentState);
+            currentState = undo.getLast();
+            undo.removeLast();
+        }
         currentState.enter(this);
         currentState.render(this);
     }
@@ -79,6 +88,10 @@ public class ViewContext {
         return undo;
     }
 
+    public ArrayList<ViewState> getRedo(){
+        return redo;
+    }
+
     public AuthenticationContext getAuthContext() {
         return authContext;
     }
@@ -89,5 +102,13 @@ public class ViewContext {
 
     public RegistrationPeriodContext getRegistrationPeriodContext() {
         return registrationPeriodContext;
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
     }
 }

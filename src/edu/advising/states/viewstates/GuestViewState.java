@@ -1,5 +1,6 @@
 package edu.advising.states.viewstates;
 
+import edu.advising.auth.AuthenticationResult;
 import edu.advising.contexts.ViewContext;
 import edu.advising.states.ViewState;
 
@@ -32,19 +33,21 @@ public class GuestViewState implements ViewState {
 
     public void handleAction(ViewContext ctx, String command, String p1, String p2, String p3){
         switch (command) {
-            case "LOGIN" -> ctx.getAuthContext().login(p1,p2,p3);
+            case "LOGIN" -> {
+                AuthenticationResult result = ctx.getAuthContext().login(p1, p2, p3);
+                if (!result.isFullyAuthenticated()) {
+                    System.out.println("Login failed: " + result.getMessage());
+                    return;
+                }
+                ctx.setCurrentUser(result.getUser());
+                switch (result.getUser().getUserType()) {
+                    case "STUDENT" -> ctx.navigateTo(StudentDashboardViewState.getInstance());
+                    case "FACULTY" -> ctx.navigateTo(FacultyDashboardViewState.getInstance());
+                    default -> throw new IllegalArgumentException("Unknown userType - " + result.getUser().getUserType());
+                }
+            }
             case "LOGOUT" -> ctx.logout();
-            default -> throw new IllegalArgumentException(
-                    "Unknown handleAction command - " + command
-            );
-        };
-
-        String userType = ctx.getAuthContext().getUserFactory().getUserByUsername(p1).getUserType();
-
-        switch (userType){
-            case "STUDENT" -> ctx.navigateTo(StudentDashboardViewState.getInstance());
-            case "FACULTY" -> ctx.navigateTo(FacultyDashboardViewState.getInstance());
-            default -> throw new IllegalArgumentException("Unknown userType - " + userType);
+            default -> throw new IllegalArgumentException("Unknown handleAction command - " + command);
         }
     }
 
