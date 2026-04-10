@@ -5,7 +5,7 @@ import edu.advising.states.ViewState;
 
 public class RegistrationViewState implements ViewState {
 
-    private RegistrationViewState instance = new RegistrationViewState();
+    private static final RegistrationViewState instance = new RegistrationViewState();
 
     @Override
     public boolean requiresAuthentication() {
@@ -14,7 +14,33 @@ public class RegistrationViewState implements ViewState {
 
     @Override
     public void handleAction() {
+        System.out.println("Error - Registration View handleAction call contains no parameters");
+    }
 
+    @Override
+    public void handleAction(ViewContext viewContext, String login, String jsmith, String s, String string) {
+
+    }
+
+    public void handleAction(ViewContext ctx, String command){
+        switch(command){
+            case "LOGOUT" -> ctx.logout();
+            default -> throw new IllegalArgumentException("Unknown handleAction command - " + command);
+        }
+    }
+
+    @Override
+    public void handleAction(ViewContext viewContext, String command1, String command2) {
+
+    }
+
+    public void handleAction(ViewContext ctx, String command, String p1, String p2) {
+        switch (command) {
+            case "CHECK_STATUS" -> render(ctx, p1, p2);
+            default -> throw new IllegalArgumentException(
+                    "Unknown handleAction command - " + command
+            );
+        };
     }
 
     @Override
@@ -23,13 +49,18 @@ public class RegistrationViewState implements ViewState {
     }
 
     @Override
-    public void exit() {
+    public void exit(ViewContext viewContext) {
 
     }
 
     @Override
-    public void render() {
+    public void render(ViewContext viewContext) {
 
+    }
+
+    public void render(ViewContext viewContext, String p1, String p2) {
+        int currentPeriod = viewContext.getRegistrationPeriodContext().currentPeriod();
+        //TODO: Use the view template object to make the Strings needed
     }
 
     @Override
@@ -37,7 +68,7 @@ public class RegistrationViewState implements ViewState {
         return "REGISTRATION";
     }
 
-    public RegistrationViewState getInstance() {
-        return this.instance;
+    public static RegistrationViewState getInstance() {
+        return instance;
     }
 }

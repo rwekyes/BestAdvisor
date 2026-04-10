@@ -5,7 +5,7 @@ import edu.advising.states.ViewState;
 
 public class TranscriptViewState implements ViewState {
 
-    private TranscriptViewState instance = new TranscriptViewState();
+    private static TranscriptViewState instance = new TranscriptViewState();
 
     @Override
     public boolean requiresAuthentication() {
@@ -14,6 +14,24 @@ public class TranscriptViewState implements ViewState {
 
     @Override
     public void handleAction() {
+        System.out.println("Error - Transcript View handleAction call contains no parameters");
+    }
+
+    @Override
+    public void handleAction(ViewContext viewContext, String command, String p1, String p2, String p3) {
+        System.out.println("Error - Transcript View handleAction call contains too many parameters");
+    }
+
+    @Override
+    public void handleAction(ViewContext ctx, String command){
+        switch(command){
+            case "LOGOUT" -> ctx.logout();
+            default -> throw new IllegalArgumentException("Unknown handleAction command - " + command);
+        }
+    }
+
+    @Override
+    public void handleAction(ViewContext viewContext, String command1, String command2) {
 
     }
 
@@ -23,12 +41,12 @@ public class TranscriptViewState implements ViewState {
     }
 
     @Override
-    public void exit() {
+    public void exit(ViewContext viewContext) {
 
     }
 
     @Override
-    public void render() {
+    public void render(ViewContext viewContext) {
 
     }
 
@@ -37,8 +55,8 @@ public class TranscriptViewState implements ViewState {
         return "TRANSCRIPT_VIEW";
     }
 
-    public TranscriptViewState getInstance() {
-        return this.instance;
+    public static TranscriptViewState getInstance() {
+        return instance;
     }
 
 }

@@ -266,4 +266,8 @@ public class AuthenticationContext {
             return false;
         }, username);
     }
+
+    public UserFactory getUserFactory(){
+        return userFactory;
+    }
 }
