@@ -1,31 +1,51 @@
 package edu.advising.states.viewstates;
 
-import edu.advising.auth.AuthenticationContext;
 import edu.advising.contexts.ViewContext;
 import edu.advising.states.ViewState;
 
 public class GuestViewState implements ViewState {
 
-    private AuthenticationContext authContext;
-    private static GuestViewState instance = new GuestViewState();
+    private static final GuestViewState instance = new GuestViewState();
     @Override
     public boolean requiresAuthentication() {
         return false;
     }
 
-    @Override
-    public void handleAction() {
+    private GuestViewState(){
 
     }
 
-    public void handleAction(String command, String p1, String p2, String p3){
+    @Override
+    public void handleAction() {
+        System.out.println("Error - Guest View handleAction call contains no parameters");
+    }
+
+    @Override
+    public void handleAction(ViewContext viewContext, String command) {
+
+    }
+
+    @Override
+    public void handleAction(ViewContext viewContext, String command1, String command2) {
+
+    }
+
+    public void handleAction(ViewContext ctx, String command, String p1, String p2, String p3){
         switch (command) {
-            case "LOGIN" -> authContext.login(p1,p2,p3);
-            case "LOGOUT" -> authContext.logout();
+            case "LOGIN" -> ctx.getAuthContext().login(p1,p2,p3);
+            case "LOGOUT" -> ctx.logout();
             default -> throw new IllegalArgumentException(
-                    "Unknown handleAction command - " + command + " - "
+                    "Unknown handleAction command - " + command
             );
         };
+
+        String userType = ctx.getAuthContext().getUserFactory().getUserByUsername(p1).getUserType();
+
+        switch (userType){
+            case "STUDENT" -> ctx.navigateTo(StudentDashboardViewState.getInstance());
+            case "FACULTY" -> ctx.navigateTo(FacultyDashboardViewState.getInstance());
+            default -> throw new IllegalArgumentException("Unknown userType - " + userType);
+        }
     }
 
     @Override
@@ -34,12 +54,12 @@ public class GuestViewState implements ViewState {
     }
 
     @Override
-    public void exit() {
+    public void exit(ViewContext viewContext) {
 
     }
 
     @Override
-    public void render() {
+    public void render(ViewContext viewContext) {
 
     }
 

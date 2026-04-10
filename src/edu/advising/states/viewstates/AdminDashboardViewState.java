@@ -17,17 +17,32 @@ public class AdminDashboardViewState implements ViewState {
     }
 
     @Override
+    public void handleAction(ViewContext viewContext, String command) {
+
+    }
+
+    @Override
+    public void handleAction(ViewContext viewContext, String command1, String command2) {
+
+    }
+
+    @Override
+    public void handleAction(ViewContext viewContext, String login, String jsmith, String s, String string) {
+
+    }
+
+    @Override
     public void enter(ViewContext viewContext) {
 
     }
 
     @Override
-    public void exit() {
+    public void exit(ViewContext viewContext) {
 
     }
 
     @Override
-    public void render() {
+    public void render(ViewContext viewContext) {
 
     }
 
