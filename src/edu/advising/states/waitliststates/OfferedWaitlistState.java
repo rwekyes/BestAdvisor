@@ -36,7 +36,6 @@ public class OfferedWaitlistState implements WaitlistState {
         // Check if the seat is taken before acceptance
         if (!ctx.getSection().hasCapacity()) {
             ctx.setState(ExpiredWaitlistState.getInstance());
-            ctx.persist();
             return;
         }
 
@@ -44,13 +43,11 @@ public class OfferedWaitlistState implements WaitlistState {
                 new RegisterCommand(ctx.getStudent(), ctx.getSection())
         );
         ctx.setState(EnrolledFromWaitlistState.getInstance());
-        ctx.persist();
     }
 
     @Override
     public void decline(WaitlistContext ctx) {
         ctx.setState(RemovedWaitlistState.getInstance());
-        ctx.persist();
 
         // Promote next student if section has capacity
         try {
@@ -82,7 +79,6 @@ public class OfferedWaitlistState implements WaitlistState {
         ctx.setState(RemovedWaitlistState.getInstance());
         // Remove that student from the waitlist
         ctx.getSection().removeFromWaitlist(ctx.getStudent());
-        ctx.persist();
     }
 
     @Override
@@ -90,7 +86,6 @@ public class OfferedWaitlistState implements WaitlistState {
         ctx.setState(ExpiredWaitlistState.getInstance());
         // Remove that student from the waitlist
         ctx.getSection().removeFromWaitlist(ctx.getStudent());
-        ctx.persist();
     }
 
     @Override

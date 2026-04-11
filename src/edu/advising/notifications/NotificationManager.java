@@ -1,5 +1,6 @@
 package edu.advising.notifications;
 
+import edu.advising.commands.TranscriptRequest;
 import edu.advising.core.DatabaseManager;
 import edu.advising.users.Student;
 import edu.advising.users.User;
@@ -164,6 +165,10 @@ public class NotificationManager implements Subject {
         notification.addMetadata("courseCode", courseCode);
         notification.addMetadata("position", String.valueOf(position));
         notifyObservers(notification);
+    }
+
+    public void notifyTranscriptRequestStatusChange(Student student, String newStatus){
+        // TODO: Wire up fully later
     }
 
     /**

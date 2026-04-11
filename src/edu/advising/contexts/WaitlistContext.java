@@ -50,11 +50,26 @@ public class WaitlistContext {
     }
 
     // Action block
-    public void offer(int expiryHours) { state.offer(this, expiryHours); }
-    public void accept()               { state.accept(this); }
-    public void decline()              { state.decline(this); }
-    public void remove(String reason)  { state.remove(this, reason); }
-    public void expire()               { state.expire(this); }
+    public void offer(int expiryHours) {
+        state.offer(this, expiryHours);
+        persist();
+    }
+    public void accept()               {
+        state.accept(this);
+        persist();
+    }
+    public void decline()              {
+        state.decline(this);
+        persist();
+    }
+    public void remove(String reason)  {
+        state.remove(this, reason);
+        persist();
+    }
+    public void expire()               {
+        state.expire(this);
+        persist();
+    }
     public boolean isActivelyWaiting() { return state.isActivelyWaiting(); }
 
     // Getters

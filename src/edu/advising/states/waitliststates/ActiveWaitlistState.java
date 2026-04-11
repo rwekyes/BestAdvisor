@@ -22,7 +22,6 @@ public class ActiveWaitlistState implements WaitlistState {
         ctx.getEntry().setRemovedDate(LocalDateTime.now().plusHours(expiryHours));
         ctx.getEntry().setNotificationSent(true);
         ctx.setState(OfferedWaitlistState.getInstance());
-        ctx.persist();
         ctx.getNotificationManager().notifyWaitlistUpdate(
                 ctx.getStudent(), ctx.getSection().getCourseCode(), ctx.getEntry().getPosition());
     }
@@ -44,7 +43,6 @@ public class ActiveWaitlistState implements WaitlistState {
         ctx.setState(RemovedWaitlistState.getInstance());
         // Remove that student from the waitlist
         ctx.getSection().removeFromWaitlist(ctx.getStudent());
-        ctx.persist();
         ctx.getNotificationManager().notifyWaitlistUpdate(
                 ctx.getStudent(), ctx.getSection().getCourseCode(), ctx.getEntry().getPosition());
     }
@@ -54,7 +52,6 @@ public class ActiveWaitlistState implements WaitlistState {
         ctx.setState(ExpiredWaitlistState.getInstance());
         // Remove that student from the waitlist
         ctx.getSection().removeFromWaitlist(ctx.getStudent());
-        ctx.persist();
         ctx.getNotificationManager().notifyWaitlistUpdate(
                 ctx.getStudent(), ctx.getSection().getCourseCode(), ctx.getEntry().getPosition());
     }
