@@ -2,6 +2,7 @@ package edu.advising.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.advising.contexts.WaitlistContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
 import edu.advising.notifications.NotificationManager;
@@ -48,6 +49,13 @@ public class WaitlistCommand extends BaseCommand {
         executionTime = LocalDateTime.now();
 
         if ((this.waitlistId = section.addToWaitlist(student)) > 0) {
+
+            WaitlistEntry entry = fetchWaitlistEntry(waitlistId); // raw fetch by id
+            WaitlistContext ctx = WaitlistContext.fromEntry(entry, section, student,
+                    new CommandExecutor(student.getId()));
+            // Entry is already ACTIVE from default — persist to confirm status
+            ctx.persist();
+
             executed = true;
             successful = true;
             try {
@@ -124,6 +132,15 @@ public class WaitlistCommand extends BaseCommand {
             this.section = DatabaseManager.getInstance().fetchOne(Section.class, "id", sectionId);
         } catch (JsonProcessingException | SQLException e) {
             throw new RuntimeException("Failed to deserialize WaitlistCommand data", e);
+        }
+    }
+
+    private WaitlistEntry fetchWaitlistEntry(int waitlistId) {
+        try {
+            return section.getWaitlist().get(waitlistId);
+        } catch (SQLException e){
+            System.out.println("Exception fetching waitlist entry - " + e);
+            return null;
         }
     }
 }

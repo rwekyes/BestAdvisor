@@ -2,10 +2,12 @@ package edu.advising.states;
 
 import edu.advising.contexts.EnrollmentContext;
 
+import java.sql.SQLException;
+
 public interface EnrollmentState extends State {
     void confirm(EnrollmentContext ctx);
-    void drop(EnrollmentContext ctx);
-    void withdraw(EnrollmentContext ctx);
+    void drop(EnrollmentContext ctx) throws SQLException;
+    void withdraw(EnrollmentContext ctx) throws SQLException;
     void complete(EnrollmentContext ctx, String finalGrade);
     void reenroll(EnrollmentContext ctx);
 
@@ -17,5 +19,5 @@ public interface EnrollmentState extends State {
 
     String getStatusName();
 
-    void drop(EnrollmentContext ctx, String reason);
+    void drop(EnrollmentContext ctx, String reason) throws SQLException;
 }

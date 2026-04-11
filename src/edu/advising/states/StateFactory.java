@@ -50,15 +50,15 @@ public class StateFactory {
 
     public static WaitlistState waitlistStateFor(String s) {
         if (s == null) {
-            return WaitingWaitlistState.getInstance();
+            return ActiveWaitlistState.getInstance();
         }
 
         return switch (s) {
             case "EXPIRED" -> ExpiredWaitlistState.getInstance();
-            case "FULFILLED" -> FulfilledWaitlistState.getInstance();
-            case "PROMOTED" -> PromotedWaitlistState.getInstance();
+            case "ENROLLED" -> EnrolledFromWaitlistState.getInstance();
+            case "OFFERED" -> OfferedWaitlistState.getInstance();
             case "REMOVED" -> RemovedWaitlistState.getInstance();
-            case "WAITING" -> WaitingWaitlistState.getInstance();
+            case "ACTIVE" -> ActiveWaitlistState.getInstance();
             default -> throw new IllegalArgumentException(
                     "Unknown Waitlist Status - " + s + " - "
             );
