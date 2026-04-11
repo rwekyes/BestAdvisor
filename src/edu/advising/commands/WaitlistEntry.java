@@ -23,6 +23,8 @@ public class WaitlistEntry {
     private LocalDateTime addedDate;
     @Column(name = "removed_date")
     private LocalDateTime removedDate;
+    @Column(name = "remove_reason")
+    private String removeReason;
     @Column(name = "status")
     private String status;
     @Column(name = "notification_sent")
@@ -91,6 +93,12 @@ public class WaitlistEntry {
     public void setRemovedDate(LocalDateTime removedDate) {
         this.removedDate = removedDate;
     }
+
+    public void setRemoveReason(String reason) {
+        this.removeReason = reason;
+    }
+
+    public String getRemoveReason() { return removeReason; }
 
     public String getStatus() {
         return status;

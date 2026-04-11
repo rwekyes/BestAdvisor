@@ -1,7 +1,14 @@
 package edu.advising.states.enrollmentstates;
 
+import edu.advising.commands.CommandExecutor;
+import edu.advising.commands.WaitlistEntry;
 import edu.advising.contexts.EnrollmentContext;
+import edu.advising.contexts.WaitlistContext;
+import edu.advising.core.DatabaseManager;
+import edu.advising.notifications.ObservableStudent;
 import edu.advising.states.EnrollmentState;
+
+import java.sql.SQLException;
 
 public class WaitlistedEnrollmentState implements EnrollmentState {
 
@@ -19,15 +26,30 @@ public class WaitlistedEnrollmentState implements EnrollmentState {
     }
 
     @Override
-    public void drop(EnrollmentContext ctx) {
-        // TODO: After setting up the waitlist state machine, come back and clean up this mess
-        throw new UnsupportedOperationException("Waitlist drop not yet implemented");
+    public void drop(EnrollmentContext ctx) throws SQLException{
+        drop(ctx, "UNKNOWN");
     }
 
     @Override
-    public void withdraw(EnrollmentContext ctx) {
-        // TODO: After setting up the waitlist state machine, come back and clean up this mess
-        throw new UnsupportedOperationException("Waitlist withdrawal not yet implemented");
+    public void withdraw(EnrollmentContext ctx) throws SQLException{
+        // TODO: Waitlist story — dropping from waitlist removes the WaitlistEntry
+        String sql = "SELECT * FROM waitlist WHERE student_id = ? AND section_id = ? AND status = 'ACTIVE'";
+        WaitlistEntry entry = DatabaseManager.getInstance().fetch(sql, rs -> {
+            WaitlistEntry e = new WaitlistEntry();
+            e.setId(rs.getInt("id"));
+            e.setStudentId(rs.getInt("student_id"));
+            e.setSectionId(rs.getInt("section_id"));
+            e.setStatus(rs.getString("status"));
+            return e;
+        }, ctx.getStudent().getId(), ctx.getSection().getId());
+
+        if (entry == null) return; // student wasn't on waitlist, nothing to clean up
+
+        ObservableStudent obs = ObservableStudent.fromSuperType(ctx.getStudent());
+        WaitlistContext wCtx = WaitlistContext.fromEntry(
+                entry, ctx.getSection(), obs, new CommandExecutor(ctx.getStudent().getId())
+        );
+        wCtx.remove("WITHDRAWN");
     }
 
     @Override
@@ -71,7 +93,24 @@ public class WaitlistedEnrollmentState implements EnrollmentState {
     }
 
     @Override
-    public void drop(EnrollmentContext ctx, String reason) {
+    public void drop(EnrollmentContext ctx, String reason) throws SQLException {
+        // TODO: Waitlist story — dropping from waitlist removes the WaitlistEntry
+        String sql = "SELECT * FROM waitlist WHERE student_id = ? AND section_id = ? AND status = 'ACTIVE'";
+        WaitlistEntry entry = DatabaseManager.getInstance().fetch(sql, rs -> {
+            WaitlistEntry e = new WaitlistEntry();
+            e.setId(rs.getInt("id"));
+            e.setStudentId(rs.getInt("student_id"));
+            e.setSectionId(rs.getInt("section_id"));
+            e.setStatus(rs.getString("status"));
+            return e;
+        }, ctx.getStudent().getId(), ctx.getSection().getId());
 
+        if (entry == null) return; // student wasn't on waitlist, nothing to clean up
+
+        ObservableStudent obs = ObservableStudent.fromSuperType(ctx.getStudent());
+        WaitlistContext wCtx = WaitlistContext.fromEntry(
+                entry, ctx.getSection(), obs, new CommandExecutor(ctx.getStudent().getId())
+        );
+        wCtx.remove("DROPPED");
     }
 }

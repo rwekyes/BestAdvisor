@@ -59,11 +59,11 @@ public class EnrollmentContext {
         state.confirm(this);
         persist();
     }
-    public void drop(String reason) {
+    public void drop(String reason) throws SQLException{
         state.drop(this, reason);
         persist();
     }
-    public void withdraw() {
+    public void withdraw() throws SQLException{
         state.withdraw(this);
         persist();
     }

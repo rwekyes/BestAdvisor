@@ -3,6 +3,7 @@ package edu.advising.commands;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.advising.contexts.EnrollmentContext;
+import edu.advising.contexts.WaitlistContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
 import edu.advising.notifications.ObservableStudent;
@@ -143,17 +144,17 @@ public class DropCommand extends BaseCommand {
             WaitlistEntry nextWaitlistEntry = section.getWaitlist().get(0);
             // Lookup the student for this entry
             Student student = nextWaitlistEntry.getStudent();
-            // Remove that student from the waitlist
-            section.removeFromWaitlist(student);
+            // wrap in Observable
+            ObservableStudent obs = ObservableStudent.fromSuperType(student);
 
-            // Below is commented out, can be removed as the enrollmentContext now handles this
-            // section.enroll(student);
+            WaitlistContext ctx = WaitlistContext.fromEntry(
+                    nextWaitlistEntry, section, obs, new CommandExecutor(student.getId())
+            );
+            ctx.offer(24);// Offer with a default 24hr expiry
 
-            EnrollmentContext enrollmentContext = EnrollmentContext.create(student, section);
-            enrollmentContext.confirm();
+
             System.out.println(String.format("↑ Student ID %s promoted from waitlist", student.getStudentId()));
 
-            // TODO: In real implementation, notify the student with observer!!!
         }
     }
 

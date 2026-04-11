@@ -111,4 +111,8 @@ public class ViewContext {
     public void setCurrentUser(User currentUser) {
         this.currentUser = currentUser;
     }
+
+    public CommandExecutor getCommandExecutor() {
+        return commandExecutor;
+    }
 }
