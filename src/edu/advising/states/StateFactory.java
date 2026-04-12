@@ -1,5 +1,6 @@
 package edu.advising.states;
 
+import edu.advising.states.transcriptrequeststates.*;
 import edu.advising.states.transcriptstates.*;
 import edu.advising.states.enrollmentstates.*;
 import edu.advising.states.permissionstates.*;
@@ -14,7 +15,7 @@ public class StateFactory {
 
     public static TranscriptState transcriptStateFor(String s) {
         if (s == null) {
-            return GoodStandingTranscriptState.getInstance();
+            return GoodStandingTranscriptState.getInstance(); // Defaults to Good Standing, because I'm not sure of the business logic
         }
 
         return switch (s) {
@@ -26,6 +27,24 @@ public class StateFactory {
             case "WITHDRAWN" -> WithdrawnTranscriptState.getInstance();
             default -> throw new IllegalArgumentException(
                     "Unknown Transcript Status - " + s + " - "
+            );
+        };
+    }
+
+    public static TranscriptRequestState transcriptRequestStateFor(String s) {
+        if (s == null) {
+            return PendingTranscriptRequestState.getInstance();
+        }
+
+        return switch (s) {
+            case "PENDING" -> PendingTranscriptRequestState.getInstance();
+            case "PROCESSING" -> ProcessingTranscriptRequestState.getInstance();
+            case "READY" -> ReadyTranscriptRequestState.getInstance();
+            case "SENT" -> SentTranscriptRequestState.getInstance();
+            case "CANCELLED" -> CancelledTranscriptRequestState.getInstance();
+            case "FAILED" -> FailedTranscriptRequestState.getInstance();
+            default -> throw new IllegalArgumentException(
+                    "Unknown Transcript Request Status - " + s + " - "
             );
         };
     }

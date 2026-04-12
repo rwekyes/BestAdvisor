@@ -1069,6 +1069,8 @@ public class DatabaseManager {
                     "fee DECIMAL(6,2), " +
                     "is_rush BOOLEAN DEFAULT FALSE, " +
                     "completed_date TIMESTAMP, " +
+                    "failure_reason TEXT, " +
+                    "processed_by INT, " +
                     "FOREIGN KEY (student_id) REFERENCES students(id))");
 
             // ================================================================
