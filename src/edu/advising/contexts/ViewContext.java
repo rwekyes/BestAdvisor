@@ -9,6 +9,7 @@ import edu.advising.states.viewstates.GuestViewState;
 import edu.advising.states.viewstates.RegistrationViewState;
 import edu.advising.users.User;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ViewContext {
@@ -21,10 +22,10 @@ public class ViewContext {
     private CommandExecutor commandExecutor;
     private User currentUser;
 
-    public ViewContext(){
+    public ViewContext() throws SQLException {
         this.authContext = new AuthenticationContext(new BasicAuthentication());
         this.facultyPermissionContext = new FacultyPermissionContext();
-        this.registrationPeriodContext = new RegistrationPeriodContext();
+        this.registrationPeriodContext = RegistrationPeriodContext.currentPeriod("",1); // TODO: Default to actual current period by grabbing from the db
         this.currentState = GuestViewState.getInstance();
         this.currentState.enter(this);
         this.undo = new ArrayList<ViewState>();

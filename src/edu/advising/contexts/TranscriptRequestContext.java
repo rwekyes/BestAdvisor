@@ -5,7 +5,6 @@ import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.states.StateFactory;
 import edu.advising.states.TranscriptRequestState;
-import edu.advising.states.transcriptrequeststates.PendingTranscriptRequestState;
 import edu.advising.users.Student;
 
 import java.sql.SQLException;
