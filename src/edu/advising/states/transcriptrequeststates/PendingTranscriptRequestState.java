@@ -27,7 +27,8 @@ public class PendingTranscriptRequestState implements TranscriptRequestState {
 
     @Override
     public void cancel(TranscriptRequestContext ctx) {
-
+        ctx.setState(CancelledTranscriptRequestState.getInstance());
+        ctx.getNotificationManager().notifyTranscriptRequestStatusChange(ctx.getStudent(),"CANCELLED");
     }
 
     @Override

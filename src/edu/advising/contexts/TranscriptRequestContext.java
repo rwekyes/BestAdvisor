@@ -3,6 +3,7 @@ package edu.advising.contexts;
 import edu.advising.commands.TranscriptRequest;
 import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.NotificationManager;
+import edu.advising.states.StateFactory;
 import edu.advising.states.TranscriptRequestState;
 import edu.advising.states.transcriptrequeststates.PendingTranscriptRequestState;
 import edu.advising.users.Student;
@@ -21,12 +22,14 @@ public class TranscriptRequestContext {
         this.transcriptRequest = transcriptRequest;
         this.student = student;
         this.notificationManager = NotificationManager.getInstance();
-        this.state = PendingTranscriptRequestState.getInstance();
+        this.state = StateFactory.transcriptRequestStateFor(transcriptRequest.getStatus());
     }
 
     public static TranscriptRequestContext create(Student student) throws SQLException, IllegalAccessException {
         TranscriptRequest t = new TranscriptRequest(student);
         t.setTrackingNumber(generateTrackingNumber());
+        t.setStatus("PENDING");
+        t.setRequestType("OFFICIAL");
         DatabaseManager.getInstance().upsert(t);
         return new TranscriptRequestContext(t, student);
     }

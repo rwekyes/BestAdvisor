@@ -22,7 +22,7 @@ public class ReadyTranscriptRequestState implements TranscriptRequestState {
     @Override
     public void send(TranscriptRequestContext ctx) {
         ctx.setState(SentTranscriptRequestState.getInstance());
-        ctx.getNotificationManager().notifyTranscriptRequestStatusChange(ctx.getStudent(),"SEND");
+        ctx.getNotificationManager().notifyTranscriptRequestStatusChange(ctx.getStudent(),"SENT");
     }
 
     @Override

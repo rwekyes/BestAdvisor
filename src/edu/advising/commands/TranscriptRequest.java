@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 Transcript Request - represents a... transcript request
 */
 
-@Table(name = "transcript_request")
+@Table(name = "transcript_requests")
 public class TranscriptRequest {
     @Id(isPrimary = true)
     @Column(name = "id", upsertIgnore = true)
@@ -35,7 +35,7 @@ public class TranscriptRequest {
     private BigDecimal fee;
     @Column(name = "is_rush")
     private boolean isRush;
-    @Column(name = "completed_at")
+    @Column(name = "completed_date")
     private LocalDateTime completedAt;
     @Column(name = "failure_reason")
     private String failureReason;
@@ -48,12 +48,13 @@ public class TranscriptRequest {
     public TranscriptRequest(){}
 
     public TranscriptRequest(Student student){
+        this.studentId = student.getId();
         this.student = student;
     }
 
     public TranscriptRequest(int studentId) throws SQLException{
         this.student = DatabaseManager.getInstance()
-                .fetchOne(Student.class, "id", this.studentId);
+                .fetchOne(Student.class, "id", studentId);
     }
 
     public void setStatus(String statusName) {

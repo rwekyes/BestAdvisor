@@ -33,6 +33,7 @@ public class ProcessingTranscriptRequestState implements TranscriptRequestState 
 
     @Override
     public void fail(TranscriptRequestContext ctx, String reason) {
+        ctx.getTranscriptRequest().setFailureReason(reason);
         ctx.setState(FailedTranscriptRequestState.getInstance());
         ctx.getNotificationManager().notifyTranscriptRequestStatusChange(ctx.getStudent(),"FAILED");
     }
