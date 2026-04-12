@@ -5,6 +5,8 @@ import edu.advising.states.ViewState;
 import edu.advising.states.viewstates.*;
 import edu.advising.users.UserFactory;
 
+import java.sql.SQLException;
+
 public class ViewContextViewStatesTest {
     public static void main(String[] args){
         DatabaseManager db = DatabaseManager.getInstance();
@@ -14,7 +16,12 @@ public class ViewContextViewStatesTest {
         factory.createUser("STUDENT", "jsmith", "Password1!", "jsmith@school.edu", "John", "Smith", "S12345");
         factory.createUser("FACULTY", "prof.jones", "Password1!", "jones@school.edu", "Diana", "Jones", "E001", "Computer Science");
 
-        ViewContext viewContext = new ViewContext();
+        ViewContext viewContext = null;
+        try {
+            viewContext = new ViewContext();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         System.out.println("---");
         System.out.println("Navigating to initial view -");

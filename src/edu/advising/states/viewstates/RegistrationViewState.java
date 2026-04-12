@@ -1,5 +1,7 @@
 package edu.advising.states.viewstates;
 
+import edu.advising.commands.RegistrationPeriod;
+import edu.advising.contexts.RegistrationPeriodContext;
 import edu.advising.contexts.ViewContext;
 import edu.advising.states.ViewState;
 
@@ -59,7 +61,7 @@ public class RegistrationViewState implements ViewState {
     }
 
     public void render(ViewContext viewContext, String p1, String p2) {
-        int currentPeriod = viewContext.getRegistrationPeriodContext().currentPeriod();
+        RegistrationPeriod currentPeriod = viewContext.getRegistrationPeriodContext().getRegistrationPeriod();
         //TODO: Use the view template object to make the Strings needed
     }
 

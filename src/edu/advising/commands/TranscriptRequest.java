@@ -45,7 +45,9 @@ public class TranscriptRequest {
     @ManyToOne(targetEntity = Student.class, joinColumn = "student_id")
     private Student student;
 
-    public TranscriptRequest(){}
+    public TranscriptRequest(){
+        throw new IllegalStateException("Transcript request cannot be created without a student or student id");
+    }
 
     public TranscriptRequest(Student student){
         this.studentId = student.getId();

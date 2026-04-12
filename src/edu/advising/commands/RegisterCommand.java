@@ -2,6 +2,7 @@ package edu.advising.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.advising.contexts.EnrollmentContext;
+import edu.advising.contexts.RegistrationPeriodContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
 import edu.advising.notifications.NotificationManager;
@@ -42,6 +43,24 @@ public class RegisterCommand extends BaseCommand {
     @Override
     public void execute() {
         executionTime = LocalDateTime.now();
+
+        // Check if registration is closed before continuing
+        try {
+            RegistrationPeriodContext periodCtx = RegistrationPeriodContext.currentPeriod(
+                    section.getSemester(), section.getYear());
+            if (periodCtx == null || !periodCtx.canRegister()) {
+                successful = false;
+                errorMessage = "Registration is not currently open for " + section.getCourseCode();
+                System.out.println("✗ " + errorMessage);
+                return;
+            }
+        } catch (SQLException e) {
+            // If we can't check the period, fail safe — block registration
+            successful = false;
+            errorMessage = "Could not verify registration period status";
+            System.out.println("✗ " + errorMessage);
+            return;
+        }
 
         if (!section.hasCapacity()) {
             successful = false;

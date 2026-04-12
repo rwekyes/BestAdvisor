@@ -86,14 +86,14 @@ public class StateFactory {
 
     public static RegistrationState registrationStateFor(String s) {
         if (s == null) {
-            return OpenEnrollmentRegistrationState.getInstance();
+            return OpenRegistrationState.getInstance();
         }
 
         return switch (s) {
-            case "ADD_DROP" -> AddDropRegistrationState.getInstance();
+            case "NOT_OPEN" -> NotOpenRegistrationState.getInstance();
             case "CLOSED" -> ClosedRegistrationState.getInstance();
-            case "OPEN_ENROLLMENT" -> OpenEnrollmentRegistrationState.getInstance();
-            case "PRIORITY_OPEN" -> PriorityOpenRegistrationState.getInstance();
+            case "OPEN" -> OpenRegistrationState.getInstance();
+            case "LATE" -> LateRegistrationState.getInstance();
             default -> throw new IllegalArgumentException(
                     "Unknown Registration Status - " + s + " - "
             );
