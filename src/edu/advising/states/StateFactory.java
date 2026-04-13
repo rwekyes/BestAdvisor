@@ -3,7 +3,7 @@ package edu.advising.states;
 import edu.advising.states.transcriptrequeststates.*;
 import edu.advising.states.transcriptstates.*;
 import edu.advising.states.enrollmentstates.*;
-import edu.advising.states.permissionstates.*;
+import edu.advising.states.facultypermissionstates.*;
 import edu.advising.states.registrationstates.*;
 import edu.advising.states.waitliststates.*;
 
@@ -100,18 +100,18 @@ public class StateFactory {
         };
     }
 
-    public static PermissionState permissionStateFor(String s) {
+    public static FacultyPermissionState facultyPermissionStateFor(String s) {
         if (s == null) {
-            return NotRequestedPermissionState.getInstance();
+            return RequestedPermissionState.getInstance();
         }
 
         return switch (s) {
             case "DENIED" -> DeniedPermissionState.getInstance();
-            case "GRANTED" -> GrantedPermissionState.getInstance();
-            case "NOT_REQUESTED" -> NotRequestedPermissionState.getInstance();
-            case "PENDING" -> PendingPermissionState.getInstance();
+            case "APPROVED" -> ApprovedPermissionState.getInstance();
+            case "REQUESTED" -> RequestedPermissionState.getInstance();
+            case "EXPIRED" -> ExpiredPermissionState.getInstance();
             default -> throw new IllegalArgumentException(
-                    "Unknown Permission Status - " + s + " - "
+                    "Unknown Faculty Permission Status - " + s + " - "
             );
         };
     }

@@ -1073,6 +1073,17 @@ public class DatabaseManager {
                     "processed_by INT, " +
                     "FOREIGN KEY (student_id) REFERENCES students(id))");
 
+            executeUpdate("CREATE TABLE IF NOT EXISTS faculty_permissions (" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "section_id INT NOT NULL, " +
+                    "waitlist_id INT NOT NULL, " +
+                    "request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                    "expiry_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                    "deny_reason TEXT, " +
+                    "status VARCHAR(20) NOT NULL DEFAULT 'REQUESTED', " + // REQUESTED, APPROVED, DENIED, EXPIRED
+                    "FOREIGN KEY (waitlist_id) REFERENCES waitlist(id), " +
+                    "FOREIGN KEY (section_id) REFERENCES sections(id))");
+
             // ================================================================
             // WEEK 7: Permissions & Restrictions (Decorator Pattern)
             // ================================================================

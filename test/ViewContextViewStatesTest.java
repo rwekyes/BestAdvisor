@@ -17,11 +17,9 @@ public class ViewContextViewStatesTest {
         factory.createUser("FACULTY", "prof.jones", "Password1!", "jones@school.edu", "Diana", "Jones", "E001", "Computer Science");
 
         ViewContext viewContext = null;
-        try {
-            viewContext = new ViewContext();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+
+        viewContext = new ViewContext();
+
 
         System.out.println("---");
         System.out.println("Navigating to initial view -");

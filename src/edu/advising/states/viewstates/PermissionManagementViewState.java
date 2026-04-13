@@ -32,7 +32,7 @@ public class PermissionManagementViewState implements ViewState {
     public void handleAction(ViewContext ctx, String command1, String command2) {
 
         switch (command1) {
-            case "APPROVE" -> ctx.getFacultyPermissionContext().approve(command2);
+            case "APPROVE" -> ctx.getFacultyPermissionContext().approve();
             default -> throw new IllegalArgumentException("Unknown handleAction command1 - " + command1);
         }
 

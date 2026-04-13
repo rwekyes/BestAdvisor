@@ -22,10 +22,10 @@ public class ViewContext {
     private CommandExecutor commandExecutor;
     private User currentUser;
 
-    public ViewContext() throws SQLException {
+    public ViewContext() {
         this.authContext = new AuthenticationContext(new BasicAuthentication());
-        this.facultyPermissionContext = new FacultyPermissionContext();
-        this.registrationPeriodContext = RegistrationPeriodContext.currentPeriod("",1); // TODO: Default to actual current period by grabbing from the db
+        this.facultyPermissionContext = null; // TODO: Remove or update this when the UI logic is made
+        this.registrationPeriodContext = null; // TODO: Remove or update this when the UI logic is made
         this.currentState = GuestViewState.getInstance();
         this.currentState.enter(this);
         this.undo = new ArrayList<ViewState>();

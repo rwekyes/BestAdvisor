@@ -2,6 +2,7 @@ package edu.advising.notifications;
 
 import edu.advising.commands.TranscriptRequest;
 import edu.advising.core.DatabaseManager;
+import edu.advising.users.Faculty;
 import edu.advising.users.Student;
 import edu.advising.users.User;
 
@@ -248,5 +249,13 @@ public class NotificationManager implements Subject {
 
     public int getObserverCount() {
         return observers.size();
+    }
+
+    public void notifyPermissionRequest(Faculty faculty, String courseCode) {
+        // TODO: notify faculty that a student is requesting permission for courseCode
+    }
+
+    public void notifyPermissionDecision(Student student, String courseCode, String decision) {
+        // TODO: notify student of APPROVED or DENIED decision for courseCode
     }
 }
