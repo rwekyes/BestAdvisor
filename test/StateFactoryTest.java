@@ -89,16 +89,16 @@ public class StateFactoryTest {
         System.out.println("Permission States: ");
 
         System.out.println("DENIED - " +
-                StateFactory.permissionStateFor("DENIED").getClass().getSimpleName()
+                StateFactory.facultyPermissionStateFor("DENIED").getClass().getSimpleName()
         );
-        System.out.println("GRANTED - " +
-                StateFactory.permissionStateFor("GRANTED").getClass().getSimpleName()
+        System.out.println("APPROVED - " +
+                StateFactory.facultyPermissionStateFor("APPROVED").getClass().getSimpleName()
         );
-        System.out.println("NOT_REQUESTED - " +
-                StateFactory.permissionStateFor("NOT_REQUESTED").getClass().getSimpleName()
+        System.out.println("REQUESTED - " +
+                StateFactory.facultyPermissionStateFor("REQUESTED").getClass().getSimpleName()
         );
-        System.out.println("PENDING - " +
-                StateFactory.permissionStateFor("PENDING").getClass().getSimpleName()
+        System.out.println("EXPIRED - " +
+                StateFactory.facultyPermissionStateFor("EXPIRED").getClass().getSimpleName()
         );
 
     }

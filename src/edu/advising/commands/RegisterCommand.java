@@ -2,6 +2,7 @@ package edu.advising.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.advising.contexts.EnrollmentContext;
+import edu.advising.contexts.FacultyPermissionContext;
 import edu.advising.contexts.RegistrationPeriodContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
@@ -63,10 +64,25 @@ public class RegisterCommand extends BaseCommand {
         }
 
         if (!section.hasCapacity()) {
-            successful = false;
-            errorMessage = String.format("Registration failed for %s - section full", section.getCourseCode());
-            System.out.println("✗ " + errorMessage);
-            return;
+            // Check if student has a valid faculty permission to bypass capacity
+            try {
+                FacultyPermission fp = fetchPermissionForStudent(student, section);
+                FacultyPermissionContext permCtx = fp != null
+                        ? FacultyPermissionContext.load(fp, null, section, null)
+                        : null;
+                if (permCtx == null || !permCtx.isValid()) {
+                    successful = false;
+                    errorMessage = String.format("Registration failed for %s - section full",
+                            section.getCourseCode());
+                    System.out.println("✗ " + errorMessage);
+                    return;
+                }
+                // Valid permission — bypass capacity check and continue
+            } catch (SQLException e) {
+                successful = false;
+                errorMessage = "Could not verify faculty permission";
+                return;
+            }
         }
 
         if (hasScheduleConflict()) {
@@ -160,6 +176,25 @@ public class RegisterCommand extends BaseCommand {
         } catch (JsonProcessingException | SQLException e) {
             throw new RuntimeException("Failed to deserialize RegisterCommand data", e);
         }
+    }
+
+    private FacultyPermission fetchPermissionForStudent(Student student, Section section) throws SQLException {
+        String sql = "SELECT fp.* FROM faculty_permissions fp " +
+                "JOIN waitlist w ON fp.waitlist_id = w.id " +
+                "WHERE w.student_id = ? AND fp.section_id = ? AND fp.status = 'APPROVED'";
+        return DatabaseManager.getInstance().fetch(sql, rs -> {
+            FacultyPermission fp = new FacultyPermission();
+            fp.setId(rs.getInt("id"));
+            fp.setSectionId(rs.getInt("section_id"));
+            fp.setWaitlistId(rs.getInt("waitlist_id"));
+            var requestTs = rs.getTimestamp("request_date");
+            fp.setRequestDate(requestTs != null ? requestTs.toLocalDateTime() : null);
+            var expiryTs = rs.getTimestamp("expiry_date");
+            fp.setExpiryDate(expiryTs != null ? expiryTs.toLocalDateTime() : null);
+            fp.setDenyReason(rs.getString("deny_reason"));
+            fp.setStatus(rs.getString("status"));
+            return fp;
+        }, student.getId(), section.getId());
     }
 }
 
