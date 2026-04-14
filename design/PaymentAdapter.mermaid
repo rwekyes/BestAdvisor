@@ -1,0 +1,79 @@
+---
+title: Payment Adapter
+---
+classDiagram
+    class PaymentGateway{
+        <<interface>>
+        +processPayment(Student, Amount, PaymentMethod) : PaymentResult
+    }
+    class PaymentPlanGateway{
+        <<interface>>
+        +setupPlan(Student, totalAmount, installments)
+    }
+    class EnrollmentVerificationGateway{
+        <<interface>>
+        +getVerification(student) : EnrollmentVerification
+        +getPortalLink(student) : String
+    }
+    class FinanceDataGateway{
+        <<interface>>
+        +getHistoricalRecords(student) : List
+    }
+    class TranscriptFulfillmentGateway{
+        <<interface>>
+        +submitRequest(TranscriptRequest) : TranscriptFulfillmentResult
+    }
+    class LegacyFinanceAdapter{
+
+    }
+    class NbsPaymentAdapter{
+
+    }
+    class NscAdapter{
+
+    }
+    class NbsPaymentPlanAdapter{
+
+    }
+    class PaymentPlanSchedule{
+
+    }
+    class NotificationChannel{
+
+    }
+    class TranscriptFulfillmentAdapter{
+
+    }
+    class NbsExternalPaymentService{
+
+    }
+    class NscExternalApi{
+
+    }
+    class LegacyFinanceSystem{
+
+    }
+    class ExternalEmailGateway{
+
+    }
+    class ExternalSmsGateway{
+
+    }
+    class ExternalFulfillmentService{
+
+    }
+
+    NbsPaymentPlanAdapter --|> PaymentPlanGateway : implements
+    NbsPaymentAdapter --|> PaymentGateway : implements
+    LegacyFinanceAdapter --|> FinanceDataGateway : implements
+    NscAdapter --|> EnrollmentVerificationGateway : implements
+    EmailAdapter --|> NotificationChannel : implements
+    SmsAdapter --|> NotificationChannel : implements
+    NbsPaymentAdapter *-- NbsExternalPaymentService : contains
+    NbsPaymentPlanAdapter *-- NbsInstallmentService : contains
+    NscAdapter *-- NscExternalApi : contains
+    LegacyFinanceAdapter *-- LegacyFinanceSystem : contains
+    EmailAdapter *-- ExternalEmailGateway : contains
+    SmsAdapter *-- ExternalSmsGateway : contains
+    TranscriptFulfillmentAdapter --|> TranscriptFulfillmentGateway : implements
+    TranscriptFulfillmentAdapter *-- ExternalFulfillmentService : contains
