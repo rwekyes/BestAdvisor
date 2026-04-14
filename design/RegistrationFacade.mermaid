@@ -1,0 +1,41 @@
+---
+title: Registration Facade
+---
+classDiagram
+    class RegistrationFacade{
+        -RegisterFacade()
+        +register(Student, Section) : RegistrationResult
+        +drop(Student, Section) : RegistrationStatus
+        +evaluateProgram(Student) : ProgramEvaluationResult
+        +getEducationalPlan(Student) : EducationalPlan
+        +checkGraduationEligibility(Student) : GraduationEligibilityResult
+    }
+    class Student{
+
+    }
+    class Section{
+
+    }
+    class RegistrationPeriodContext{
+
+    }
+    class RegistrationResult{
+        <<enumeration>>
+    }
+    class RegistrationStatus{
+        +getViewState() : ViewState
+        +getActions() : Actions
+        +getRegistrationOpen() : LocalDateTime
+        +getRegistrationClosed() : LocalDateTime
+        +getRegistrationLate() : LocalDateTime
+        +getStudentSchedule() : StudentSchedule
+    }
+    class ViewContext{
+
+    }
+    RegistrationFacade --* ViewContext : Has a
+    RegistrationFacade *-- Student : Has a
+    RegistrationFacade *-- Section : Has a
+    RegistrationFacade *-- RegistrationPeriodContext : Has a
+    RegistrationFacade *-- RegistrationResult : Has a
+    RegistrationFacade *-- RegistrationStatus : Has a
