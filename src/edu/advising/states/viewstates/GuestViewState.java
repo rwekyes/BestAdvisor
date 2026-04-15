@@ -16,25 +16,10 @@ public class GuestViewState implements ViewState {
 
     }
 
-    @Override
-    public void handleAction() {
-        System.out.println("Error - Guest View handleAction call contains no parameters");
-    }
-
-    @Override
-    public void handleAction(ViewContext viewContext, String command) {
-
-    }
-
-    @Override
-    public void handleAction(ViewContext viewContext, String command1, String command2) {
-
-    }
-
-    public void handleAction(ViewContext ctx, String command, String p1, String p2, String p3){
+    public void handleAction(ViewContext ctx, String command, String... params){
         switch (command) {
             case "LOGIN" -> {
-                AuthenticationResult result = ctx.getAuthContext().login(p1, p2, p3);
+                AuthenticationResult result = ctx.getAuthContext().login(params[0], params[1], params[3]);
                 if (!result.isFullyAuthenticated()) {
                     System.out.println("Login failed: " + result.getMessage());
                     return;

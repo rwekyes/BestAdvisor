@@ -13,28 +13,16 @@ public class FacultyDashboardViewState implements ViewState {
     }
 
     @Override
-    public void handleAction() {
-        System.out.println("Error - Faculty View handleAction call contains no parameters");
-    }
-
-    @Override
-    public void handleAction(ViewContext viewContext, String command, String p1, String p2, String p3) {
-        System.out.println("Error - Faculty View handleAction call contains too many parameters");
-    }
-
-    public void handleAction(ViewContext ctx, String command){
+    public void handleAction(ViewContext ctx, String command, String... params) {
         switch(command){
+            case "NAVIGATE" -> {
+                switch (params[0]) {
+                    case "PERMISSIONS" -> ctx.navigateTo(PermissionManagementViewState.getInstance());
+                    default -> throw new IllegalArgumentException("Unknown handleAction param1 - " + params[0]);
+                }
+            }
             case "LOGOUT" -> ctx.logout();
             default -> throw new IllegalArgumentException("Unknown handleAction command - " + command);
-        }
-    }
-
-    public void handleAction(ViewContext ctx, String command1, String command2) {
-        if(command1 == "NAVIGATE") {
-            switch (command2) {
-                case "PERMISSIONS" -> ctx.navigateTo(PermissionManagementViewState.getInstance());
-                default -> throw new IllegalArgumentException("Unknown handleAction command2 - " + command2);
-            }
         }
     }
 
@@ -50,7 +38,7 @@ public class FacultyDashboardViewState implements ViewState {
 
     @Override
     public void render(ViewContext viewContext) {
-
+        viewContext.getCurrentUser().showDashboard();
     }
 
     @Override

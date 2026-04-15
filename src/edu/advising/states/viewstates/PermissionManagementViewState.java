@@ -12,30 +12,13 @@ public class PermissionManagementViewState implements ViewState {
         return true;
     }
 
-    @Override
-    public void handleAction() {
-        System.out.println("Error - PermissionManagement View handleAction call contains no parameters");
-    }
 
-    @Override
-    public void handleAction(ViewContext viewContext, String login, String jsmith, String s, String string) {
-        System.out.println("Error - PermissionManagement View handleAction call contains too many parameters");
-    }
-
-    public void handleAction(ViewContext ctx, String command){
-        switch(command){
+    public void handleAction(ViewContext ctx, String command, String... params) {
+        switch (command) {
+            case "APPROVE" -> ctx.getFacultyPermissionContext().approve();
             case "LOGOUT" -> ctx.logout();
             default -> throw new IllegalArgumentException("Unknown handleAction command - " + command);
         }
-    }
-
-    public void handleAction(ViewContext ctx, String command1, String command2) {
-
-        switch (command1) {
-            case "APPROVE" -> ctx.getFacultyPermissionContext().approve();
-            default -> throw new IllegalArgumentException("Unknown handleAction command1 - " + command1);
-        }
-
     }
 
     @Override

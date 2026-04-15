@@ -5,30 +5,20 @@ import edu.advising.states.ViewState;
 
 public class AdminDashboardViewState implements ViewState {
 
-    private AdminDashboardViewState instance = new AdminDashboardViewState();
+    private static final AdminDashboardViewState instance = new AdminDashboardViewState();
+
     @Override
     public boolean requiresAuthentication() {
         return true;
     }
 
-    @Override
-    public void handleAction() {
-
-    }
 
     @Override
-    public void handleAction(ViewContext viewContext, String command) {
-
-    }
-
-    @Override
-    public void handleAction(ViewContext viewContext, String command1, String command2) {
-
-    }
-
-    @Override
-    public void handleAction(ViewContext viewContext, String login, String jsmith, String s, String string) {
-
+    public void handleAction(ViewContext ctx, String command, String... params) {
+        switch(command){
+            case "LOGOUT" -> ctx.logout();
+            default -> throw new IllegalArgumentException("Unknown handleAction command - " + command);
+        }
     }
 
     @Override
@@ -43,7 +33,7 @@ public class AdminDashboardViewState implements ViewState {
 
     @Override
     public void render(ViewContext viewContext) {
-
+        viewContext.getCurrentUser().showDashboard();
     }
 
     @Override
@@ -52,6 +42,6 @@ public class AdminDashboardViewState implements ViewState {
     }
 
     public AdminDashboardViewState getInstance() {
-        return this.instance;
+        return instance;
     }
 }
