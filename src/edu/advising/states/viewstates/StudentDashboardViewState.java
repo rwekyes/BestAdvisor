@@ -12,29 +12,23 @@ public class StudentDashboardViewState implements ViewState {
         return true;
     }
 
-    @Override
-    public void handleAction(ViewContext viewContext, String login, String jsmith, String s, String string) {
-        System.out.println("Error - Student View handleAction call contains too many parameters");
-    }
-
-    public void handleAction() {
-        System.out.println("Error - Student View handleAction call contains no parameters");
-    }
-
     public void handleAction(ViewContext ctx, String command){
         switch(command){
-            case "LOGOUT" -> ctx.logout();
             default -> throw new IllegalArgumentException("Unknown handleAction command - " + command);
         }
     }
 
-    public void handleAction(ViewContext ctx, String command1, String command2) {
-        if(command1 == "NAVIGATE") {
-            switch (command2) {
-                case "REGISTRATION" -> ctx.navigateTo(RegistrationViewState.getInstance());
-                case "TRANSCRIPT" -> ctx.navigateTo(TranscriptViewState.getInstance());
-                default -> throw new IllegalArgumentException("Unknown handleAction command2 - " + command2);
+    public void handleAction(ViewContext ctx, String command, String... params) {
+        switch(command){
+            case "NAVIGATE" -> {
+                switch (params[0]) {
+                    case "REGISTRATION" -> ctx.navigateTo(RegistrationViewState.getInstance());
+                    case "TRANSCRIPT" -> ctx.navigateTo(TranscriptViewState.getInstance());
+                    default -> throw new IllegalArgumentException("Unknown handleAction parameter - " + params[0]);
+                }
             }
+            case "LOGOUT" -> ctx.logout();
+            default -> throw new IllegalArgumentException("Unknown handleAction command - " + command);
         }
     }
 
@@ -50,7 +44,7 @@ public class StudentDashboardViewState implements ViewState {
 
     @Override
     public void render(ViewContext viewContext) {
-
+        viewContext.getCurrentUser().showDashboard();
     }
 
     @Override

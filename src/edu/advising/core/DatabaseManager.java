@@ -838,6 +838,12 @@ public class DatabaseManager {
                     "hire_date DATE, " +
                     "FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE)");
 
+            executeUpdate("CREATE TABLE IF NOT EXISTS admins (" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "employee_id INT NOT NULL, " +
+                    "access_level VARCHAR(50) NOT NULL, " +
+                    "FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE)");
+
             // ================================================================
             // WEEK 3: Authentication & Security (Strategy Pattern)
             // ================================================================
@@ -1083,6 +1089,7 @@ public class DatabaseManager {
                     "status VARCHAR(20) NOT NULL DEFAULT 'REQUESTED', " + // REQUESTED, APPROVED, DENIED, EXPIRED
                     "FOREIGN KEY (waitlist_id) REFERENCES waitlist(id), " +
                     "FOREIGN KEY (section_id) REFERENCES sections(id))");
+
 
             // ================================================================
             // WEEK 7: Permissions & Restrictions (Decorator Pattern)
