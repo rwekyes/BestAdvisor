@@ -1112,7 +1112,7 @@ public class DatabaseManager {
                     "feature_code VARCHAR(50) NOT NULL, " +
                     "can_access BOOLEAN DEFAULT TRUE, " +
                     "source VARCHAR(100), " +
-                    "UNIQUE(role_name, feature_code))");
+                    "UNIQUE(group_name, feature_code))");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS permission_grants (" +
                     "id  INT AUTO_INCREMENT PRIMARY KEY," +

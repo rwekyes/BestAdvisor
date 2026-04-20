@@ -3,6 +3,7 @@ import edu.advising.commands.Section;
 import edu.advising.contexts.RegistrationPeriodContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.ObservableStudent;
+import edu.advising.permissions.PermissionTreeFactory;
 import edu.advising.states.StateFactory;
 import edu.advising.states.registrationstates.*;
 import edu.advising.users.Student;
@@ -346,7 +347,7 @@ public class RegistrationPeriodStateMachineTest {
             ObservableStudent obs = ObservableStudent.fromSuperType(raw);
             Section section = db.fetchOne(Section.class, "id", sectionId);
 
-            RegisterCommand cmd = new RegisterCommand(obs, section);
+            RegisterCommand cmd = new RegisterCommand(obs, section, PermissionTreeFactory.forUser(obs));
             cmd.execute();
 
             if (!cmd.wasSuccessful()) pass(name);

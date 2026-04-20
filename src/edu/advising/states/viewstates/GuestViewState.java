@@ -2,7 +2,9 @@ package edu.advising.states.viewstates;
 
 import edu.advising.auth.AuthenticationResult;
 import edu.advising.contexts.ViewContext;
+import edu.advising.permissions.PermissionTreeFactory;
 import edu.advising.states.ViewState;
+
 
 public class GuestViewState implements ViewState {
 
@@ -25,9 +27,18 @@ public class GuestViewState implements ViewState {
                     return;
                 }
                 ctx.setCurrentUser(result.getUser());
+
+                ctx.setPermissionTree(PermissionTreeFactory.forUser(result.getUser()));
+
+                if(ctx.getPermissionTree() == null || ctx.getPermissionTree().getChildren().isEmpty()) {
+                    System.err.println("Failed to create permission tree for user - " + result.getUser().getUsername());
+                    return;
+                }
+
                 switch (result.getUser().getUserType()) {
                     case "STUDENT" -> ctx.navigateTo(StudentDashboardViewState.getInstance());
                     case "FACULTY" -> ctx.navigateTo(FacultyDashboardViewState.getInstance());
+                    case "ADMIN" -> ctx.navigateTo(AdminDashboardViewState.getInstance());
                     default -> throw new IllegalArgumentException("Unknown userType - " + result.getUser().getUserType());
                 }
             }

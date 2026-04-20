@@ -9,8 +9,8 @@ public class Permissions {
     @Id(isPrimary = true)
     @Column(name = "id", upsertIgnore = true)
     private int id;
-    @Column(name = "role_name")
-    private String roleName;
+    @Column(name = "group_name")
+    private String groupName;
     @Column(name = "feature_code")
     private String featureCode;
     @Column(name = "can_access")
@@ -22,11 +22,11 @@ public class Permissions {
     }
 
     public String getRoleName() {
-        return roleName;
+        return groupName;
     }
 
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
+    public void setRoleName(String groupName) {
+        this.groupName = groupName;
     }
 
     public String getFeatureCode() {

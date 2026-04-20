@@ -15,8 +15,11 @@ public class PermissionCheckVisitor implements PermissionVisitor{
 
     @Override
     public void visit(FeaturePermission f) {
-        if(f.getFeatureCode().equals(featureCode) && f.isGranted()){
-            result = true;
+        if(f.getFeatureCode().equals(featureCode)){
+            if(f.isGranted()) {
+                result = true;
+            }
+            else result = false;
         }
     }
 

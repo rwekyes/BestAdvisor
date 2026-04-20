@@ -5,7 +5,6 @@ public class FeaturePermission implements PermissionComponent{
     private boolean granted;
     private String groupName;
     private String source;
-    private String description;
 
     public FeaturePermission(String groupName, String featureCode, boolean granted, String source){
         this.groupName = groupName;
@@ -37,7 +36,9 @@ public class FeaturePermission implements PermissionComponent{
         return featureCode;
     }
 
-    public String getDescription(){
-        return description;
+    @Override
+    public void setGranted(boolean newGranted){
+        this.granted = newGranted;
     }
+
 }

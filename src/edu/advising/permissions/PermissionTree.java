@@ -19,22 +19,26 @@ public class PermissionTree {
     private User user;
     private ArrayList<PermissionComponent> children;
 
+    public PermissionTree() {
+        this.children = new ArrayList<>();
+    }
+
     public PermissionTree(User user) throws SQLException{
         this.user = user;
         DatabaseManager db = DatabaseManager.getInstance();
 
         // Raw SQL to create a new permission tree from a table join for each session
-        String sql = "SELECT p.feature_code, p.can_access, p.role_name " +
+        String sql = "SELECT p.feature_code, p.can_access, p.group_name " +
                 "FROM user_roles ur " +
-                "JOIN permissions p ON ur.role_name = p.role_name " +
+                "JOIN permissions p ON ur.role_name = p.group_name " +
                 "WHERE ur.user_id = ? AND ur.is_active = TRUE";
         // Builds a list of FeaturePermissions from the result set
         List<FeaturePermission> leaves = db.fetchList(sql, rs -> {
                 return new FeaturePermission(
-                        rs.getString("role_name"), // temporarily store the group name on the leaf
+                        rs.getString("group_name"), // temporarily store the group name on the leaf
                         rs.getString("feature_code"),
                         rs.getBoolean("can_access"),
-                        rs.getString("source")
+                        null
                 );
         }, user.getId());
 
@@ -53,24 +57,49 @@ public class PermissionTree {
     }
 
     public boolean hasPermission(String featureCode){
-        for(PermissionComponent component : children){
-            if(featureCode.equals(component.getFeatureCode()) && component.isGranted()){
-                return true;
-            }
+        PermissionCheckVisitor visitor = new PermissionCheckVisitor(featureCode);
+        for (PermissionComponent child : children){
+            child.accept(visitor);
         }
-        return false;
+        return visitor.getResult();
     }
 
     public RestrictionSummary getRestrictions(){
-        /*
-        accepts a visitor and returns the full RestrictionSummary
-         */
+        RestrictionListVisitor visitor = new RestrictionListVisitor();
+        for (PermissionComponent child : children){
+            child.accept(visitor);
+        }
 
-        return null;
+        return visitor.getSummary();
     }
 
-    public String explainDenial(String featureCode){
-        return null;
+    public String explainDenial(String featureCode) {
+        for (PermissionComponent child : children) {
+            if (child instanceof PermissionGroup group) {
+                for (PermissionComponent leaf : group.getChildren()) {
+                    if (leaf.getFeatureCode().equals(featureCode) && !leaf.isGranted()) {
+                        return ((FeaturePermission) leaf).getSource();
+                    }
+                }
+            }
+        }
+        return "Unknown denial reason - " + featureCode;
+    }
+
+    public ArrayList<PermissionComponent> getChildren(){
+        return children;
+    }
+
+    public void add(PermissionComponent component){
+        children.add(component);
+    }
+
+    public void remove(PermissionComponent component){
+        children.remove(component);
+    }
+
+    public User getUser(){
+        return user;
     }
 
 }

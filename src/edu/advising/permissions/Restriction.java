@@ -5,9 +5,9 @@ public class Restriction {
     public final String office;
     public final String resolution;
 
-    public Restriction(FeaturePermission fp){
+    public Restriction(FeaturePermission fp, String office){
         this.type = fp.getFeatureCode();
-        this.office = fp.getGroupName();
+        this.office = office;
         this.resolution = fp.getSource();
     }
 }

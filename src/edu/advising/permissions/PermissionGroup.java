@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class PermissionGroup implements PermissionComponent{
 
     private String name;
-    private ArrayList<PermissionComponent> children;
+    private ArrayList<PermissionComponent> children = new ArrayList<>();
     private boolean granted;
 
     public PermissionGroup(String name){
@@ -33,9 +33,10 @@ public class PermissionGroup implements PermissionComponent{
 
     @Override
     public String getFeatureCode() {
-        return "name";      // getFeatureCode returns the name for branches, in case logic needs it
+        return name;      // getFeatureCode returns the name for branches, in case logic needs it
     }
 
+    @Override
     public void setGranted(boolean newGranted){
         this.granted = newGranted;
     }

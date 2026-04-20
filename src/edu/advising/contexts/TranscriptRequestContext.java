@@ -3,6 +3,9 @@ package edu.advising.contexts;
 import edu.advising.commands.TranscriptRequest;
 import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.NotificationManager;
+import edu.advising.permissions.FeatureCodes;
+import edu.advising.permissions.PermissionTree;
+import edu.advising.permissions.PermissionTreeFactory;
 import edu.advising.states.StateFactory;
 import edu.advising.states.TranscriptRequestState;
 import edu.advising.users.Student;
@@ -25,6 +28,10 @@ public class TranscriptRequestContext {
     }
 
     public static TranscriptRequestContext create(Student student) throws SQLException, IllegalAccessException {
+        PermissionTree tree = PermissionTreeFactory.forUser(student);
+        if (tree == null || !tree.hasPermission(FeatureCodes.ORDER_TRANSCRIPT)) {
+            throw new SQLException(tree.explainDenial(FeatureCodes.ORDER_TRANSCRIPT));
+        }
         TranscriptRequest t = new TranscriptRequest(student);
         t.setTrackingNumber(generateTrackingNumber());
         t.setStatus("PENDING");

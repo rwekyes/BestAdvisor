@@ -2,6 +2,7 @@ import edu.advising.commands.*;
 import edu.advising.contexts.FacultyPermissionContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.ObservableStudent;
+import edu.advising.permissions.PermissionTreeFactory;
 import edu.advising.states.StateFactory;
 import edu.advising.states.facultypermissionstates.*;
 import edu.advising.users.Faculty;
@@ -448,7 +449,7 @@ public class FacultyPermissionStateMachineTest {
                     LocalDateTime.now().plusDays(17),
                     "OPEN");
 
-            RegisterCommand cmd = new RegisterCommand(obs, section);
+            RegisterCommand cmd = new RegisterCommand(obs, section, PermissionTreeFactory.forUser(obs));
             cmd.execute();
 
             if (cmd.wasSuccessful()) pass(name);
@@ -481,7 +482,7 @@ public class FacultyPermissionStateMachineTest {
                     LocalDateTime.now().plusDays(17),
                     "OPEN");
 
-            RegisterCommand cmd = new RegisterCommand(obs, section);
+            RegisterCommand cmd = new RegisterCommand(obs, section, PermissionTreeFactory.forUser(obs));
             cmd.execute();
 
             if (!cmd.wasSuccessful()) pass(name);

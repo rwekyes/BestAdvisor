@@ -1,5 +1,6 @@
 import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.*;
+import edu.advising.permissions.PermissionTreeFactory;
 import edu.advising.users.Student;
 import edu.advising.users.UserFactory;
 import edu.advising.commands.CommandRecord;
@@ -65,6 +66,8 @@ public class Week5Test {
     public static void main(String[] args) {
         banner("WEEK 5 — COMMAND PATTERN  |  CRAdvisor Test Suite");
 
+        // Had to add a bunch of try/catches to handle a change to the RegisterCommand class while adding permissions checks
+
         try {
             setUp();
         } catch (Exception e) {
@@ -72,18 +75,37 @@ public class Week5Test {
             e.printStackTrace();
             return;
         }
-
-        testRegisterCommand();
+        try {
+            testRegisterCommand();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         testDropCommand();
         testWaitlistCommand();
         testPaymentCommand();
         testUpdateContactCommand();
-        testMacroCommand();
-        testFacultyDropCommand();
+        try {
+            testMacroCommand();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            testFacultyDropCommand();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         testGrantWaitlistPermissionCommand();
-        testCommandHistoryStateMachine();
+        try {
+            testCommandHistoryStateMachine();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         testAuditHistory();
-        testEdgeCases();
+        try {
+            testEdgeCases();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         // ── Final report ──────────────────────────────────────────────────────
         banner("RESULTS");
@@ -180,11 +202,13 @@ public class Week5Test {
      *     undoButton.setEnabled(executor.canUndo());
      *   The toolbar Undo label reads: "Undo: Register for CS101-SP2026-01"
      */
-    private static void testRegisterCommand() {
+    private static void testRegisterCommand() throws SQLException{
         header("GROUP 1 — RegisterCommand");
 
         // 1.1–1.5  Successful registration
-        RegisterCommand reg = new RegisterCommand(student, section);
+
+            RegisterCommand reg = new RegisterCommand(student, section, PermissionTreeFactory.forUser(student));
+
         executor.execute(reg);
 
         check("1.1  execute() wasSuccessful()",              reg.wasSuccessful());
@@ -211,7 +235,7 @@ public class Week5Test {
         check("1.14 canRedo() = false after redo",           !executor.canRedo());
 
         // 1.15–1.17  Prevent double-registration
-        RegisterCommand dup = new RegisterCommand(student, section);
+        RegisterCommand dup = new RegisterCommand(student, section, PermissionTreeFactory.forUser(student));
         executor.execute(dup);
         check("1.15 duplicate register wasSuccessful() = false",  !dup.wasSuccessful());
         check("1.16 duplicate register enrolled count unchanged",  section.getEnrolled() == 1);
@@ -490,7 +514,7 @@ public class Week5Test {
      *     executor.execute(macro);
      *   One undo call rolls back BOTH commands in reverse order.
      */
-    private static void testMacroCommand() {
+    private static void testMacroCommand() throws SQLException{
         header("GROUP 6 — MacroCommand");
 
         // Student was left un-enrolled after group 2
@@ -498,7 +522,7 @@ public class Week5Test {
 
         // 6.1–6.3  Successful macro: register + pay
         MacroCommand macro = new MacroCommand("Register and Pay for CS101");
-        macro.addCommand(new RegisterCommand(student, section));
+        macro.addCommand(new RegisterCommand(student, section, PermissionTreeFactory.forUser(student)));
         macro.addCommand(new PaymentCommand(student, new BigDecimal("150.00"), "FEE", "ONLINE"));
         executor.execute(macro);
 
@@ -511,7 +535,7 @@ public class Week5Test {
         // 6.4–6.5  Failing sub-command triggers auto-rollback
         // The $0 PaymentCommand will fail, causing MacroCommand to undo the RegisterCommand
         MacroCommand failMacro = new MacroCommand("Bad Register and Pay");
-        failMacro.addCommand(new RegisterCommand(student, section));
+        failMacro.addCommand(new RegisterCommand(student, section, PermissionTreeFactory.forUser(student)));
         failMacro.addCommand(new PaymentCommand(student, new BigDecimal("0.00"), "FEE", "ONLINE"));
         executor.execute(failMacro);
 
@@ -535,11 +559,11 @@ public class Week5Test {
      *     facultyExecutor.execute(new FacultyDropCommand(faculty, student, section, reason));
      *   Undo reinstates the student within the same session.
      */
-    private static void testFacultyDropCommand() {
+    private static void testFacultyDropCommand() throws SQLException{
         header("GROUP 7 — FacultyDropCommand");
 
         // Enroll student first
-        executor.execute(new RegisterCommand(student, section));
+        executor.execute(new RegisterCommand(student, section, PermissionTreeFactory.forUser(student)));
         check("7.pre student enrolled for faculty-drop",     section.getEnrolled() == 1);
 
         CommandExecutor facExec = new CommandExecutor(faculty.getId());
@@ -659,7 +683,7 @@ public class Week5Test {
      *     after new action  → canUndo=T, canRedo=F  ← redo stack cleared
      *     undo on empty     → returns false
      */
-    private static void testCommandHistoryStateMachine() {
+    private static void testCommandHistoryStateMachine() throws SQLException{
         header("GROUP 9 — CommandHistory State Machine");
 
         // Fresh executor for isolated state
@@ -669,10 +693,10 @@ public class Week5Test {
         check("9.2  initial canRedo() = false",              !sm.canRedo());
 
         // Enroll student so we have something to drop/re-register
-        executor.execute(new RegisterCommand(student, section));
+        executor.execute(new RegisterCommand(student, section, PermissionTreeFactory.forUser(student)));
         check("9.pre enrolled for state machine test",       section.getEnrolled() == 1);
 
-        RegisterCommand a = new RegisterCommand(student2, section);
+        RegisterCommand a = new RegisterCommand(student2, section, PermissionTreeFactory.forUser(student));
         sm.execute(a);
         check("9.3  after execute A: canUndo=T",             sm.canUndo());
         check("9.4  after execute A: canRedo=F",             !sm.canRedo());
@@ -689,7 +713,7 @@ public class Week5Test {
         // student2 is NOT enrolled here!
 
         // new RegisterCommand for student2 instead of DropCommand that's guaranteed to fail.
-        RegisterCommand b = new RegisterCommand(student2, section);
+        RegisterCommand b = new RegisterCommand(student2, section, PermissionTreeFactory.forUser(student));
         sm.execute(b);
         check("9.9  new action clears redo: canRedo=F",      !sm.canRedo());
         check("9.10 new action: canUndo=T",                  sm.canUndo());
@@ -777,11 +801,11 @@ public class Week5Test {
      *   The pre-condition checks inside each command (amount > 0, section has
      *   capacity, etc.) represent the "Guard" layer before any DB write occurs.
      */
-    private static void testEdgeCases() {
+    private static void testEdgeCases() throws SQLException{
         header("GROUP 11 — Edge Cases");
 
         // 11.1  Register into a full section
-        RegisterCommand fullReg = new RegisterCommand(student, fullSection);
+        RegisterCommand fullReg = new RegisterCommand(student, fullSection, PermissionTreeFactory.forUser(student));
         executor.execute(fullReg);
         check(String.format("11.1 register into full section fails %n    %s", fullReg.getErrorMessage()),
                 !fullReg.wasSuccessful());
