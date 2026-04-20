@@ -13,6 +13,9 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.advising.permissions.FeatureCodes;
+import edu.advising.permissions.PermissionTree;
+import edu.advising.permissions.PermissionTreeFactory;
 import edu.advising.users.Student;
 
 import java.util.HashMap;
@@ -25,25 +28,34 @@ import java.util.Map;
 public class RegisterCommand extends BaseCommand {
     private ObservableStudent student;
     private Section section;
+    private PermissionTree permissionTree;
     private NotificationManager notificationManager;
     private int enrollmentId;
 
     // Adding No argument constructor needed for fromSuperType() and ORM autoMapper()
     public RegisterCommand() {
-        this(null, null);
+        this(null, null, null);
     }
 
-    public RegisterCommand(ObservableStudent student, Section section) {
+    public RegisterCommand(ObservableStudent student, Section section, PermissionTree permissionTree) {
         super();
         this.commandType = "REGISTER";
         this.student = student;
         this.section = section;
+        this.permissionTree = permissionTree;
         this.notificationManager = NotificationManager.getInstance();
     }
 
     @Override
     public void execute() {
         executionTime = LocalDateTime.now();
+
+        // First check for holds from the permission tree
+        if (!permissionTree.hasPermission(FeatureCodes.REGISTER_COURSES)) {
+            successful = false;
+            errorMessage = permissionTree.explainDenial(FeatureCodes.REGISTER_COURSES);
+            return;
+        }
 
         // Check if registration is closed before continuing
         try {

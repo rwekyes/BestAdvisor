@@ -41,7 +41,7 @@ public class AdminDashboardViewState implements ViewState {
         return "ADMIN_DASHBOARD";
     }
 
-    public AdminDashboardViewState getInstance() {
+    public static AdminDashboardViewState getInstance() {
         return instance;
     }
 }

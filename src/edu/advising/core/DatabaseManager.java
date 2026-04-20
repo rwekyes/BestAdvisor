@@ -1108,26 +1108,27 @@ public class DatabaseManager {
 
             executeUpdate("CREATE TABLE IF NOT EXISTS permissions (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                    "role_name VARCHAR(50) NOT NULL, " +
+                    "group_name VARCHAR(50) NOT NULL, " +
                     "feature_code VARCHAR(50) NOT NULL, " +
                     "can_access BOOLEAN DEFAULT TRUE, " +
-                    "UNIQUE(role_name, feature_code))");
+                    "source VARCHAR(100), " +
+                    "UNIQUE(group_name, feature_code))");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS permission_grants (" +
                     "id  INT AUTO_INCREMENT PRIMARY KEY," +
-            "faculty_id  INT NOT NULL," +
-            "student_id  INT NOT NULL," +
-            "section_id  INT NOT NULL," +
-            "granted_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
-            "expires_at  TIMESTAMP NOT NULL," +
-            "is_used     BOOLEAN DEFAULT FALSE," +
-            "used_at     TIMESTAMP," +
-            "is_active   BOOLEAN DEFAULT TRUE," +
-            "notes       TEXT," +
-            "FOREIGN KEY (faculty_id) REFERENCES faculty(id)," +
-            "FOREIGN KEY (student_id) REFERENCES students(id)," +
-            "FOREIGN KEY (section_id) REFERENCES sections(id)," +
-            "UNIQUE (student_id, section_id))");
+                    "faculty_id  INT NOT NULL," +
+                    "student_id  INT NOT NULL," +
+                    "section_id  INT NOT NULL," +
+                    "granted_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                    "expires_at  TIMESTAMP NOT NULL," +
+                    "is_used     BOOLEAN DEFAULT FALSE," +
+                    "used_at     TIMESTAMP," +
+                    "is_active   BOOLEAN DEFAULT TRUE," +
+                    "notes       TEXT," +
+                    "FOREIGN KEY (faculty_id) REFERENCES faculty(id)," +
+                    "FOREIGN KEY (student_id) REFERENCES students(id)," +
+                    "FOREIGN KEY (section_id) REFERENCES sections(id)," +
+                    "UNIQUE (student_id, section_id))");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS restrictions (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +

@@ -4,6 +4,7 @@ import edu.advising.auth.AuthenticationContext;
 import edu.advising.auth.BasicAuthentication;
 import edu.advising.commands.Command;
 import edu.advising.commands.CommandExecutor;
+import edu.advising.permissions.PermissionTree;
 import edu.advising.states.ViewState;
 import edu.advising.states.viewstates.GuestViewState;
 import edu.advising.states.viewstates.RegistrationViewState;
@@ -21,6 +22,7 @@ public class ViewContext {
     private RegistrationPeriodContext registrationPeriodContext;
     private CommandExecutor commandExecutor;
     private User currentUser;
+    private PermissionTree permissionTree;
 
     public ViewContext() {
         this.authContext = new AuthenticationContext(new BasicAuthentication());
@@ -115,5 +117,13 @@ public class ViewContext {
 
     public CommandExecutor getCommandExecutor() {
         return commandExecutor;
+    }
+
+    public PermissionTree getPermissionTree() {
+        return permissionTree;
+    }
+
+    public void setPermissionTree(PermissionTree permissionTree) {
+        this.permissionTree = permissionTree;
     }
 }

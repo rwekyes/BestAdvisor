@@ -7,6 +7,7 @@ import edu.advising.commands.WaitlistEntry;
 import edu.advising.contexts.EnrollmentContext;
 import edu.advising.contexts.WaitlistContext;
 import edu.advising.notifications.ObservableStudent;
+import edu.advising.permissions.PermissionTreeFactory;
 import edu.advising.states.WaitlistState;
 import edu.advising.users.Student;
 
@@ -40,7 +41,7 @@ public class OfferedWaitlistState implements WaitlistState {
         }
 
         ctx.getCommandExecutor().execute(
-                new RegisterCommand(ctx.getStudent(), ctx.getSection())
+                new RegisterCommand(ctx.getStudent(), ctx.getSection(), PermissionTreeFactory.forUser(ctx.getStudent()))
         );
         ctx.setState(EnrolledFromWaitlistState.getInstance());
     }
