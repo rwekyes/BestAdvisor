@@ -1,0 +1,50 @@
+---
+Title: Composite Pattern in Permissions Tree
+---
+
+classDiagram
+    class PermissionComponent{
+        <<interface>>
+        +accept() : void
+        +getFeatureCode() : String
+        +isGranted() : boolean
+        +setGranted() : void
+    }
+    class FeaturePermission{
+        -featureCode String
+        -granted boolean
+        -groupName String
+        -source String
+        +accept() : void
+        +getFeatureCode : String
+        +isGranted : boolean
+        +setGranted : void
+        +getGroupName : String
+        +getSource : String
+    }
+    class PermissionGroup{
+        -name String
+        -children ArrayList&ltPermissionComponent&gt
+        -granted boolean
+        +accept() : void
+        +getFeatureCode() : String
+        +isGranted() : boolean
+        +setGranted() : void
+        +addChild() : void
+        +removeChild() : void
+        +getName() : String
+        +getChildren() : ArrayList&ltPermissionComponent&gt
+    }
+    class PermissionTree{
+        +hasPermission() : boolean
+        +getRestrictions() : RestrictionSummary
+        +explainDenial() : String
+        +getChildren() : ArrayList&ltPermissionComponent&gt
+        +add() : void
+        +remove() : void
+        +getUser : User
+    }
+    PermissionComponent <|-- FeaturePermission : Implements
+    PermissionComponent <|-- PermissionGroup : Implements
+    PermissionTree *-- PermissionComponent : Has A
+    PermissionGroup *-- PermissionComponent : Has A
