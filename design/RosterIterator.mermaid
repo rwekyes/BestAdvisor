@@ -1,0 +1,126 @@
+---
+title: US-I05 — Class Roster Iterator (Iterator Pattern)
+---
+classDiagram
+
+    %% ── ITERATOR INTERFACE ───────────────────────────────────────────────────
+
+    class RosterIterator {
+        <<interface>>
+        +hasNext() boolean
+        +next() Student
+        +reset() void
+    }
+
+    %% ── CONCRETE ITERATORS ───────────────────────────────────────────────────
+
+    class AlphabeticalRosterIterator {
+        -List~Student~ sorted
+        -int cursor
+        +AlphabeticalRosterIterator(List~Student~ students)
+        +hasNext() boolean
+        +next() Student
+        +reset() void
+    }
+
+    class StudentIdRosterIterator {
+        -List~Student~ sorted
+        -int cursor
+        +StudentIdRosterIterator(List~Student~ students)
+        +hasNext() boolean
+        +next() Student
+        +reset() void
+    }
+
+    class CreditsEarnedRosterIterator {
+        -List~Student~ sorted
+        -int cursor
+        +CreditsEarnedRosterIterator(List~Student~ students)
+        +hasNext() boolean
+        +next() Student
+        +reset() void
+    }
+
+    class EnrollmentDateRosterIterator {
+        -List~Student~ sorted
+        -int cursor
+        +EnrollmentDateRosterIterator(List~Student~ students)
+        +hasNext() boolean
+        +next() Student
+        +reset() void
+    }
+
+    %% ── AGGREGATE (Iterable collection) ─────────────────────────────────────
+
+    class Roster {
+        -Section section
+        -List~Student~ students
+        +Roster(Section section)
+        +createIterator(RosterSortOrder order) RosterIterator
+        +getSection() Section
+        +size() int
+    }
+
+    %% ── SORT ORDER ENUM ──────────────────────────────────────────────────────
+
+    class RosterSortOrder {
+        <<enumeration>>
+        ALPHABETICAL
+        BY_STUDENT_ID
+        BY_CREDITS_EARNED
+        BY_ENROLLMENT_DATE
+    }
+
+    %% ── EXISTING DOMAIN CLASSES ──────────────────────────────────────────────
+
+    class Student {
+        #String studentId
+        #BigDecimal gpa
+        #String firstName
+        #String lastName
+        +getStudentId() String
+        +getGpa() BigDecimal
+        +getFirstName() String
+        +getLastName() String
+    }
+
+    class Section {
+        -int id
+        -int capacity
+        -int enrolled
+        +getEnrolledStudents() List~Student~
+        +getEnrollments() List~Enrollment~
+    }
+
+    class Enrollment {
+        -int studentId
+        -int sectionId
+        -LocalDateTime enrollmentDate
+        -String status
+        +getEnrollmentDate() LocalDateTime
+        +getStudentId() int
+    }
+
+    %% ── RELATIONSHIPS ────────────────────────────────────────────────────────
+
+    RosterIterator <|.. AlphabeticalRosterIterator
+    RosterIterator <|.. StudentIdRosterIterator
+    RosterIterator <|.. CreditsEarnedRosterIterator
+    RosterIterator <|.. EnrollmentDateRosterIterator
+
+    Roster --> RosterIterator    : creates via createIterator()
+    Roster --> RosterSortOrder   : uses
+    Roster --> Section           : aggregates students from
+
+    AlphabeticalRosterIterator     --> Student : walks
+    StudentIdRosterIterator        --> Student : walks
+    CreditsEarnedRosterIterator    --> Student : walks
+    EnrollmentDateRosterIterator   --> Enrollment : reads date from
+
+    Section "1" o-- "many" Student    : enrolled students
+    Section "1" o-- "many" Enrollment : via enrollments
+
+    %% Note: each concrete iterator sorts the student list once at construction
+    %% using a Comparator, then walks the sorted copy with a simple cursor.
+    %% Swapping sort orders in the UI is O(n log n) at iterator creation time;
+    %% the actual next() call is O(1).

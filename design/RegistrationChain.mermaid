@@ -1,0 +1,132 @@
+---
+title: US-R06 — Registration Pipeline / Schedule Conflict Check (Chain of Responsibility)
+---
+classDiagram
+
+    %% ── ABSTRACT HANDLER ─────────────────────────────────────────────────────
+
+    class RegistrationHandler {
+        <<abstract>>
+        #RegistrationHandler next
+        +setNext(RegistrationHandler next) RegistrationHandler
+        +handle(RegistrationRequest req) void
+        #abstract check(RegistrationRequest req) void
+    }
+
+    %% ── CONCRETE HANDLERS (in pipeline order) ────────────────────────────────
+
+    class AuthenticationHandler {
+        +check(RegistrationRequest req) void
+    }
+
+    class RegistrationWindowHandler {
+        -RegistrationPeriodContext periodCtx
+        +check(RegistrationRequest req) void
+    }
+
+    class PermissionHoldHandler {
+        -PermissionTree permissionTree
+        +check(RegistrationRequest req) void
+    }
+
+    class ScheduleConflictHandler {
+        +check(RegistrationRequest req) void
+        -overlaps(Section a, Section b) boolean
+    }
+
+    class CreditLimitHandler {
+        +check(RegistrationRequest req) void
+    }
+
+    class SeatAvailabilityHandler {
+        +check(RegistrationRequest req) void
+    }
+
+    %% ── REQUEST OBJECT (travels through the chain) ───────────────────────────
+
+    class RegistrationRequest {
+        -Student student
+        -Section targetSection
+        -String failedAt
+        -String errorMessage
+        -boolean routeToWaitlist
+        +getStudent() Student
+        +getTargetSection() Section
+        +fail(String handlerName, String message) void
+        +flagForWaitlist() void
+        +isFailed() boolean
+        +isRoutedToWaitlist() boolean
+        +getErrorMessage() String
+    }
+
+    %% ── EXISTING CLASSES ─────────────────────────────────────────────────────
+
+    class RegisterCommand {
+        -ObservableStudent student
+        -Section section
+        -PermissionTree permissionTree
+        -int enrollmentId
+        +execute() void
+        +undo() void
+        +isUndoable() boolean
+        +getDescription() String
+    }
+
+    class Student {
+        #String studentId
+        +getSections() List~Section~
+    }
+
+    class Section {
+        -String sectionNumber
+        -String semester
+        -int year
+        -int capacity
+        -int enrolled
+        +hasCapacity() boolean
+        +getAvailableSeats() int
+    }
+
+    class RegistrationPeriodContext {
+        +canRegister() boolean
+        +static currentPeriod(String semester, int year) RegistrationPeriodContext
+    }
+
+    class PermissionTree {
+        +hasPermission(String featureCode) boolean
+        +explainDenial(String featureCode) String
+    }
+
+    %% ── RELATIONSHIPS ────────────────────────────────────────────────────────
+
+    RegistrationHandler <|-- AuthenticationHandler
+    RegistrationHandler <|-- RegistrationWindowHandler
+    RegistrationHandler <|-- PermissionHoldHandler
+    RegistrationHandler <|-- ScheduleConflictHandler
+    RegistrationHandler <|-- CreditLimitHandler
+    RegistrationHandler <|-- SeatAvailabilityHandler
+
+    %% Chain linkage
+    RegistrationHandler --> RegistrationHandler : next
+
+    %% Each handler reads/writes the shared request object
+    RegistrationHandler    --> RegistrationRequest     : reads + writes
+    ScheduleConflictHandler --> Section               : compares meeting times
+    ScheduleConflictHandler --> Student               : reads enrolled sections
+    RegistrationWindowHandler --> RegistrationPeriodContext : checks open window
+    PermissionHoldHandler   --> PermissionTree         : checks holds
+
+    %% RegisterCommand builds the chain and fires the request
+    RegisterCommand --> RegistrationHandler  : builds chain, calls handle()
+    RegisterCommand --> RegistrationRequest  : creates
+
+    RegistrationRequest --> Student  : references
+    RegistrationRequest --> Section  : references
+
+    %% Note: ScheduleConflictHandler calls Student.getSections() to get all
+    %% currently enrolled sections, then calls overlaps() to compare each
+    %% section's meeting days/times against targetSection. If any overlap is
+    %% found, req.fail("ScheduleConflictHandler", "<details>") is called and
+    %% the chain stops. SeatAvailabilityHandler calls req.flagForWaitlist()
+    %% instead of req.fail() so the student is routed to the waitlist rather
+    %% than receiving a hard rejection.

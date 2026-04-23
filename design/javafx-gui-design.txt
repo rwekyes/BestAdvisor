@@ -1,0 +1,727 @@
+================================================================================
+BetterAdvisor — JavaFX GUI Design Specification
+================================================================================
+This document describes the screen layout, component choices, and wiring
+for every major view in the application. JavaFX class names are used
+throughout (e.g., TreeView, TableView, BorderPane).
+
+Naming convention used below:
+  [FX:ClassName]  = the JavaFX control or layout to use
+  [SCENE]         = a top-level scene (one per major screen)
+  [FXML]          = the corresponding FXML file path (relative to src/)
+
+--------------------------------------------------------------------------------
+SECTION 1 — APPLICATION SHELL
+--------------------------------------------------------------------------------
+
+The application uses a single-window, single-stage model. Every scene is
+loaded into the primary Stage via a SceneManager singleton (State Pattern).
+
+Primary Stage properties:
+  Title:   "BetterAdvisor"
+  Size:    1280 × 800 (minimum), resizable
+  Style:   StageStyle.DECORATED
+
+Root layout for authenticated screens:
+  [FX:BorderPane]
+    LEFT   → NavigationPanel (see Section 3)
+    TOP    → TopBar (see Section 2)
+    CENTER → ContentArea — swapped by SceneManager
+    BOTTOM → StatusBar [FX:HBox] showing current user, session time, messages
+
+--------------------------------------------------------------------------------
+SECTION 2 — TOP BAR
+--------------------------------------------------------------------------------
+
+[FXML] views/TopBar.fxml
+
+[FX:HBox] (height 50px, full width)
+  LEFT:
+    [FX:Label] "BetterAdvisor" (logo/title, bold 18pt)
+  CENTER (spacer [FX:Region] with HBox.hgrow=ALWAYS):
+    (empty)
+  RIGHT:
+    [FX:Label] showing "Welcome, <FirstName>" (bound to UserSession)
+    [FX:Button] "Notifications" → opens NotificationPanel popover
+      Badge [FX:Label] with unread count (hidden when 0)
+    [FX:Button] "Logout" → triggers LogoutCommand, clears session, loads Login
+
+--------------------------------------------------------------------------------
+SECTION 3 — NAVIGATION PANEL (Abstract Factory — Nav Menu)
+--------------------------------------------------------------------------------
+
+[FXML] views/NavigationPanel.fxml
+
+[FX:VBox] (width 220px, full height)
+  [FX:Label] "Navigation" (header, bold)
+  [FX:ListView<NavItem>] — items populated by NavMenuFactory
+    Student factory  → StudentNavMenuFactory  (US-AF03)
+    Faculty factory  → FacultyNavMenuFactory  (US-AF04)
+    Admin factory    → AdminNavMenuFactory     (US-AF05)
+
+  Each NavItem cell:
+    [FX:HBox] → [FX:ImageView] icon + [FX:Label] itemName
+    On click: SceneManager.navigate(item.sceneKey)
+
+  How the factory is wired:
+    At login, AuthController resolves the user role and calls
+    NavMenuFactory.create(role) which returns the correct List<NavItem>.
+    The list is set on the ListView's ObservableList.
+
+--------------------------------------------------------------------------------
+SECTION 4 — LOGIN SCREEN
+--------------------------------------------------------------------------------
+
+[SCENE] LoginScene
+[FXML]  views/LoginView.fxml
+
+[FX:VBox] centered in a [FX:StackPane] full screen
+  [FX:Label]       "BetterAdvisor" (title, 28pt)
+  [FX:TextField]   usernameField  (prompt: "Student/Faculty ID")
+  [FX:PasswordField] passwordField (prompt: "Password")
+  [FX:Button]      "Log In"       → LoginCommand (Chain: Auth pipeline step 1)
+  [FX:Label]       errorLabel     (red, hidden until a failure occurs)
+
+Behavior:
+  - Failed login increments failure counter; after 5 failures errorLabel shows
+    "Account locked. Contact your administrator." and fields are disabled.
+  - Successful login loads Dashboard scene via SceneManager.
+  - ENTER key on passwordField triggers the Log In button.
+
+--------------------------------------------------------------------------------
+SECTION 5 — STUDENT DASHBOARD (Abstract Factory)
+--------------------------------------------------------------------------------
+
+[SCENE] StudentDashboardScene
+[FXML]  views/student/StudentDashboard.fxml
+
+[FX:GridPane] (2 columns × 2 rows, padding 16px, gap 16px)
+
+  Cell [0,0] — Upcoming Schedule Widget (US-AF01)
+    [FX:VBox]
+      [FX:Label] "My Upcoming Classes" (header)
+      [FX:ListView<EnrolledSection>] — next 5 sections by day/time
+
+  Cell [1,0] — GPA & Credits Widget (US-AF01)
+    [FX:VBox]
+      [FX:Label] "Academic Standing"
+      [FX:Label] "GPA: X.XX"  (bound to Student.gpa)
+      [FX:Label] "Credits Earned: XX"
+      [FX:ProgressBar] (credits / total required)
+
+  Cell [0,1] — Account Balance Widget (US-AF01)
+    [FX:VBox]
+      [FX:Label] "Account Balance"
+      [FX:Label] "Balance Due: $X,XXX.XX"
+      [FX:Label] "Next Payment Due: MM/DD/YYYY"
+      [FX:Button] "Pay Now" → navigate to Payment screen
+
+  Cell [1,1] — Quick Actions Panel (US-AF12)
+    [FX:TilePane] (2 × 2 tiles, each a large [FX:Button])
+      "Register for Classes" → RegistrationScene
+      "Pay Balance"          → PaymentScene
+      "View Grades"          → GradesScene
+      "Order Transcript"     → TranscriptScene
+
+  Notification count:
+    Shown as a badge in the TopBar (wired to StudentNotificationFactory).
+
+--------------------------------------------------------------------------------
+SECTION 6 — FACULTY DASHBOARD (Abstract Factory)
+--------------------------------------------------------------------------------
+
+[SCENE] FacultyDashboardScene
+[FXML]  views/faculty/FacultyDashboard.fxml
+
+[FX:GridPane] (2 columns × 2 rows)
+
+  Cell [0,0] — Today's Sections Widget (US-AF02)
+    [FX:VBox]
+      [FX:Label] "Today's Classes"
+      [FX:ListView<Section>] — sections meeting today, ordered by time
+
+  Cell [1,0] — Unsubmitted Grades Widget (US-AF02)
+    [FX:VBox]
+      [FX:Label] "Grades Pending"
+      [FX:ListView<SectionGradeStatus>] — sections with missing grades
+      Count badge showing total ungraded students (US-I09)
+
+  Cell [0,1] — Budget Remaining Widget (US-AF02)
+    [FX:VBox]
+      [FX:Label] "Department Budget"
+      [FX:Label] "Remaining: $XX,XXX.XX"
+      [FX:ProgressBar] (spent / total allocated)
+
+  Cell [1,1] — Quick Actions Panel (US-AF13)
+    [FX:TilePane] (2 × 2 tiles)
+      "View Roster"    → RosterScene
+      "Submit Grades"  → GradebookScene
+      "View Schedule"  → FacultyScheduleScene
+      "Budget Summary" → BudgetScene
+
+--------------------------------------------------------------------------------
+SECTION 7 — SCHEDULE OF CLASSES / CATALOG (Composite Pattern)
+--------------------------------------------------------------------------------
+
+[SCENE] CatalogScene
+[FXML]  views/CatalogView.fxml
+
+[FX:BorderPane]
+  TOP:
+    [FX:HBox]
+      [FX:TextField] searchField (prompt: "Search by code or keyword")
+      [FX:Button]    "Search"    → calls CatalogSearchCommand (US-C02)
+      [FX:Button]    "Clear"     → resets tree to full catalog
+
+  CENTER:
+    [FX:SplitPane] (horizontal)
+      LEFT (60%):
+        [FX:TreeView<CatalogNode>] catalogTree
+          Root: hidden root
+          Level 1: CollegeNode   (shows: name, dept count, section count, credits)
+          Level 2: DepartmentNode
+          Level 3: CourseNode    (shows: code, name, credits)
+          Level 4: SectionNode   (leaf — shows: section #, instructor, seats)
+
+          CellFactory renders each level with a different icon.
+          Expanding a node loads children lazily (TreeItem.expanded listener).
+          Credit/section roll-up is computed in CompositeNode.getCredits()
+          and displayed in the cell.
+
+      RIGHT (40%):
+        [FX:ScrollPane] containing SectionDetailPanel (US-C06)
+          Populated when a SectionNode leaf is selected in the tree.
+
+          [FX:VBox]
+            [FX:Label]  "Section Detail"
+            [FX:GridPane] (label-value pairs):
+              Instructor | <name>
+              Days       | MWF
+              Time       | 10:00 AM – 10:50 AM
+              Room       | Bldg 4, Room 201
+              Seats      | 30 total / 22 enrolled / 3 waitlisted
+              Delivery   | In-Person
+            [FX:Button] "Add to Cart" → PreRegistrationCommand
+
+Search behavior (US-C02):
+  CatalogSearchCommand walks the entire composite tree using a post-order
+  iterator, collects matching SectionNodes, and rebuilds a filtered
+  TreeView showing only the path College→Dept→Course→Section for each match.
+
+--------------------------------------------------------------------------------
+SECTION 8 — PROGRAM REQUIREMENTS TREE (Composite Pattern)
+--------------------------------------------------------------------------------
+
+[SCENE] ProgramEvalScene
+[FXML]  views/student/ProgramEvalView.fxml
+
+[FX:BorderPane]
+  TOP:
+    [FX:Label] "Program Evaluation — <DegreeProgram>"
+
+  CENTER:
+    [FX:TreeView<RequirementNode>] requirementsTree
+      Each node shows:
+        name | X / Y credits completed | XX% complete
+      CompletedCourseNode (leaf): shown with a checkmark icon.
+      RemainingCourseNode (leaf): shown with an open circle icon.
+      Credits and percentages roll up via RequirementGroup.getSummary().
+
+  BOTTOM:
+    [FX:HBox]
+      [FX:Label] "Total Degree Credits: XX / YY (ZZ%)"
+      [FX:ProgressBar]
+
+--------------------------------------------------------------------------------
+SECTION 9 — MY EDUCATIONAL PLAN (Composite Pattern)
+--------------------------------------------------------------------------------
+
+[SCENE] EducationalPlanScene
+[FXML]  views/student/EducationalPlanView.fxml
+
+[FX:BorderPane]
+  LEFT:
+    [FX:TreeView<PlanNode>]  planTree
+      Root: PlanNode (student name)
+        Children: PlannedSemesterNode (e.g., "Fall 2026 — 15 credits planned")
+          Children: PlannedCourseNode (leaf — course code, name, credits)
+      Credits per semester auto-calculated in PlannedSemesterNode.getCredits().
+
+  CENTER:
+    [FX:VBox] semester detail panel
+      Shown when a PlannedSemesterNode is selected:
+        [FX:TableView<PlannedCourse>]
+          Columns: Code | Name | Credits | Status
+        [FX:HBox] "Add Course" [FX:TextField] + [FX:Button]
+        [FX:HBox] "Remove Selected" [FX:Button]
+
+  BOTTOM:
+    [FX:Label] "Total Planned Credits: XX"
+
+--------------------------------------------------------------------------------
+SECTION 10 — PREREQUISITE CHAIN DISPLAY (Composite Pattern)
+--------------------------------------------------------------------------------
+
+Shown as a panel on the right side of CatalogScene when a CourseNode is
+selected (or accessible from a "View Prerequisites" button).
+
+[FXML] views/PrerequisiteChainPanel.fxml
+
+[FX:VBox]
+  [FX:Label] "Prerequisite Chain for <CourseCode>"
+  [FX:TreeView<PrerequisiteNode>]
+    Root: the target course
+    Children: its prerequisites (may be recursive)
+    Completed prerequisites: green text + checkmark.
+    Not yet completed: normal text.
+
+--------------------------------------------------------------------------------
+SECTION 11 — BUDGET VIEWS (Composite Pattern — Faculty)
+--------------------------------------------------------------------------------
+
+[SCENE] BudgetScene
+[FXML]  views/faculty/BudgetView.fxml
+
+[FX:BorderPane]
+  TOP:
+    [FX:Label] "Department Budget — <DepartmentName>"
+
+  CENTER:
+    [FX:TreeTableView<BudgetNode>]  (US-C07, US-C08)
+      Columns:
+        Category/Item | Allocated | Spent | Remaining
+      Root node = department total (US-C08: always shown expanded)
+      Children: BudgetCategoryNode → BudgetLineItemNode (leaf)
+      All amounts roll up via BudgetNode.getAllocated() etc.
+      Leaf rows show line-item values; parent rows show sums.
+
+  BOTTOM:
+    [FX:HBox]
+      [FX:Label] "Department Total — Allocated: $X | Spent: $X | Remaining: $X"
+
+--------------------------------------------------------------------------------
+SECTION 12 — MY CLASS SCHEDULE — STUDENT (Iterator Pattern)
+--------------------------------------------------------------------------------
+
+[SCENE] StudentScheduleScene
+[FXML]  views/student/StudentScheduleView.fxml
+
+[FX:BorderPane]
+  TOP:
+    [FX:HBox] filter/view controls
+      [FX:ToggleGroup] view buttons:
+        "Weekly" (default) | "By Semester" | "By Mode" | "By Status"
+      [FX:ComboBox<DeliveryMode>] modeFilter (visible in "By Mode" view)
+      [FX:ComboBox<EnrollmentStatus>] statusFilter (visible in "By Status" view)
+
+  CENTER:
+    Swapped by the active view toggle:
+
+    Weekly View [FX:GridPane] (US-I01):
+      Columns: Mon | Tue | Wed | Thu | Fri | Async
+      Rows: time slots 7:00 AM – 10:00 PM in 30-min increments
+      Each enrolled section occupies its day/time cells.
+      Overlap: red background on conflicting cells.
+      Iterator: WeeklyScheduleIterator walks enrollments in day+time order.
+
+    Semester View [FX:Accordion] (US-I02):
+      Each [FX:TitledPane] = one semester.
+      Inside: [FX:ListView<EnrolledSection>] for that semester.
+      Iterator: SemesterIterator groups by semester, most recent first.
+
+    Mode / Status View [FX:ListView<EnrolledSection>] (US-I03, US-I04):
+      Filtered by active ComboBox selection.
+      Iterator: FilteredIterator wraps the full enrollment iterator.
+
+  BOTTOM:
+    [FX:Label] showing "X sections, Y credits" for current view.
+
+--------------------------------------------------------------------------------
+SECTION 13 — CLASS ROSTER (Faculty — Iterator Pattern)
+--------------------------------------------------------------------------------
+
+[SCENE] RosterScene
+[FXML]  views/faculty/RosterView.fxml
+
+[FX:BorderPane]
+  TOP:
+    [FX:HBox]
+      [FX:ComboBox<Section>] sectionSelector
+      [FX:ComboBox<RosterSort>] sortSelector:
+        Alphabetical | By Student ID | By Credits Earned | By Enrollment Date
+        (US-I05–I08)
+      [FX:CheckBox] "Missing Grades Only" (US-I09)
+
+  CENTER:
+    [FX:TableView<Student>]
+      Columns: Last Name | First Name | Student ID | Credits Earned |
+               Enrollment Date | Grade
+      Sorted by the active RosterIterator (strategy-like swap).
+
+  BOTTOM:
+    [FX:HBox]
+      [FX:Label] "X students shown"
+      [FX:Button] "Export Roster" → triggers ReportOutputFactory (Excel family)
+        (US-AF16)
+
+--------------------------------------------------------------------------------
+SECTION 14 — GRADEBOOK (Faculty — Iterator Pattern)
+--------------------------------------------------------------------------------
+
+[SCENE] GradebookScene
+[FXML]  views/faculty/GradebookView.fxml
+
+[FX:BorderPane]
+  TOP:
+    [FX:HBox]
+      [FX:ComboBox<Section>] sectionSelector
+      [FX:ToggleGroup]:
+        "All Students" | "Missing Grades" (US-I09) | "By Grade" (US-I10)
+
+  CENTER:
+    [FX:TableView<GradeEntry>]
+      Columns: Student Name | Student ID | Current Grade | Submitted?
+      Each row: [FX:ComboBox<GradeSymbol>] in the Grade column
+      "Submit" button per row → GradeSubmissionCommand (Chain: Grade pipeline)
+
+  BOTTOM:
+    [FX:HBox]
+      [FX:Button] "Submit All Changed Grades"
+      [FX:Label]  "X of Y grades submitted"
+
+  Grade Submission Pipeline wiring (Week 14):
+    GradeSubmissionCommand is passed through the chain:
+    AuthCheck → PermissionCheck → SectionOwnershipCheck →
+    GradingWindowCheck → ValidGradeValueCheck → NotFinalizedCheck → Execute
+
+    Each handler that fails shows a [FX:Alert] (AlertType.ERROR) with the
+    specific, actionable message (US-X01).
+
+--------------------------------------------------------------------------------
+SECTION 15 — WAITLIST VIEW (Iterator Pattern)
+--------------------------------------------------------------------------------
+
+[SCENE] WaitlistScene
+[FXML]  views/WaitlistView.fxml
+
+[FX:BorderPane]
+  TOP:
+    [FX:HBox]
+      [FX:Label] "Waitlist — <SectionCode>"
+      [FX:ToggleGroup]: "All Waitlisted" | "Permission to Add" (US-I12)
+
+  CENTER:
+    [FX:TableView<WaitlistEntry>]
+      Columns: Position | Student Name | Student ID | Date Added | P2A Approved?
+      Sorted by WaitlistPriorityIterator (US-I11).
+      "P2A" view uses PermissionToAddIterator (US-I12).
+
+  BOTTOM (faculty only):
+    [FX:Button] "Approve Permission to Add" (for selected student)
+    [FX:Button] "Promote to Enrolled" (when seat opens)
+
+--------------------------------------------------------------------------------
+SECTION 16 — SECTION SEARCH (Iterator Pattern)
+--------------------------------------------------------------------------------
+
+[SCENE] SectionSearchScene
+[FXML]  views/SectionSearchView.fxml
+
+[FX:BorderPane]
+  TOP:
+    [FX:HBox]
+      [FX:TextField]          keywordField (prompt: "Course code or title")
+      [FX:ComboBox<Subject>]  subjectFilter
+      [FX:ComboBox<Term>]     termFilter
+      [FX:Button]             "Search"
+      [FX:ComboBox<ResultSort>] sortSelector:
+        By Availability (US-I13) | By Instructor (US-I14) | Online First (US-I15)
+
+  CENTER:
+    [FX:TableView<Section>]
+      Columns: Code | Title | Instructor | Days | Time | Seats | Mode | Status
+      Sorted by the active SearchResultIterator.
+      Full sections shown with grey text; open seats shown in green.
+
+  RIGHT (split pane):
+    SectionDetailPanel (same component as CatalogScene — US-C06).
+
+  BOTTOM:
+    [FX:Button] "Add Selected Section" → launches Registration Pipeline.
+
+--------------------------------------------------------------------------------
+SECTION 17 — REGISTRATION PIPELINE UI (Chain of Responsibility)
+--------------------------------------------------------------------------------
+
+Registration is not a separate full scene — it is triggered from
+CatalogScene or SectionSearchScene and runs as a modal flow.
+
+Flow:
+  1. Student clicks "Add to Cart" / "Add Selected Section".
+  2. RegistrationCommand is constructed and passed to the chain head.
+  3. Each handler in the chain either:
+       a. Passes to the next handler (silently), or
+       b. Throws a RegistrationHandlerException with a message string.
+  4. If an exception is thrown:
+       [FX:Alert] AlertType.ERROR
+         Header:  handler name (e.g., "Prerequisite Check")
+         Content: specific message (US-X01)
+         Button:  "OK"
+  5. Seat Availability check (US-R11):
+       If section full: [FX:Alert] AlertType.CONFIRMATION
+         "This section is full. Add to waitlist?"
+         Buttons: "Yes, Waitlist Me" | "Cancel"
+  6. All checks pass:
+       [FX:Alert] AlertType.INFORMATION
+         "Successfully enrolled in <SectionCode>."
+       Dashboard and schedule widgets refresh.
+
+Audit log entry written after every pipeline run (US-X02).
+
+--------------------------------------------------------------------------------
+SECTION 18 — PAYMENT SCREEN (Chain of Responsibility)
+--------------------------------------------------------------------------------
+
+[SCENE] PaymentScene
+[FXML]  views/student/PaymentView.fxml
+
+[FX:BorderPane]
+  TOP:
+    [FX:Label] "Make a Payment"
+
+  CENTER:
+    [FX:VBox]
+      [FX:Label]        "Current Balance Due: $X,XXX.XX"
+      [FX:TextField]    amountField (prompt: "Payment amount")
+      [FX:ComboBox<PaymentMethod>] methodSelector (Credit Card, eCheck)
+      Credit card fields (visible when Credit Card selected):
+        [FX:TextField]  cardNumberField
+        [FX:TextField]  expirationField (MM/YY)
+        [FX:TextField]  cvvField
+      [FX:Button]       "Submit Payment" → PaymentCommand (Chain: Payment pipeline)
+      [FX:Label]        confirmationLabel (shown on success)
+
+  Pipeline feedback:
+    Each check failure → [FX:Alert] AlertType.ERROR with specific message.
+    Amount reasonableness warning (US-P04) → AlertType.WARNING with
+      "Continue" / "Cancel" buttons.
+    Gateway unavailable (US-P07) → AlertType.ERROR with retry suggestion.
+
+--------------------------------------------------------------------------------
+SECTION 19 — NOTIFICATION PANEL (Abstract Factory)
+--------------------------------------------------------------------------------
+
+Opened as a [FX:Popup] anchored to the Notifications button in TopBar.
+
+[FXML] views/NotificationPanel.fxml
+
+[FX:VBox] (width 320px, max-height 480px)
+  [FX:Label] "Notifications" (header)
+  [FX:ScrollPane]
+    [FX:ListView<Notification>] notificationList
+      Cell: [FX:HBox] → type icon + [FX:VBox] (title + timestamp)
+      Student notifications (US-AF06): Grade Alert, Registration, Financial Aid
+      Faculty notifications (US-AF07): Grade Deadline, Roster Change, Budget Alert
+  [FX:HBox]
+    [FX:Button] "Mark All Read"
+    [FX:Button] "Close"
+
+NotificationPanelFactory.create(role) returns the appropriate panel; only
+the role-specific types are shown.
+
+--------------------------------------------------------------------------------
+SECTION 20 — PROFILE PANEL (Abstract Factory)
+--------------------------------------------------------------------------------
+
+Navigated to via "My Profile" (added to both nav menus as a common item).
+
+[FXML] views/ProfileView.fxml
+
+[FX:BorderPane]
+  CENTER:
+    [FX:GridPane] (label | value pairs, non-editable shown as [FX:Label],
+                   editable shown as [FX:TextField])
+
+    Student panel (US-AF10):
+      Name (RO) | Student ID (RO) | Major (RO) | GPA (RO) |
+      Credits (RO) | Advisor (RO) | Status (RO) |
+      Phone (edit) | Address (edit) | Email (edit)
+
+    Faculty panel (US-AF11):
+      Name (RO) | Faculty ID (RO) | Department (RO) | Title (RO) |
+      Office Location (RO) |
+      Phone (edit) | Email (edit) | Office Hours (edit)
+
+  BOTTOM:
+    [FX:Button] "Save Changes" → UpdateProfileCommand
+
+--------------------------------------------------------------------------------
+SECTION 21 — REPORT VIEWER (Abstract Factory)
+--------------------------------------------------------------------------------
+
+[SCENE] ReportViewerScene
+[FXML]  views/ReportViewer.fxml
+
+[FX:BorderPane]
+  LEFT:
+    [FX:ListView<ReportType>] reportList
+      Student viewer (US-AF08): Unofficial Transcript | Transcript Request
+                                Status | Tax Document | Finance Summary |
+                                Payment Receipts
+      Faculty viewer (US-AF09): Class Roster | Census Roster | Gradebook |
+                                Budget Summary
+
+  TOP (right pane):
+    [FX:HBox]
+      [FX:ComboBox<OutputFormat>] formatSelector (PDF | HTML | Excel)
+      [FX:Button] "Generate"
+
+  CENTER (right pane):
+    [FX:WebView] — used for HTML family output (US-AF15)
+    PDF path: [FX:Label] "PDF generated at <path>" + [FX:Button] "Open"
+    Excel path: [FX:Label] "Excel exported to <path>" + [FX:Button] "Open"
+
+  Output format factories:
+    PDF   → PdfReportFactory   (renderer + formatter + exporter) (US-AF14)
+    HTML  → HtmlReportFactory  (rendered in WebView)             (US-AF15)
+    Excel → ExcelReportFactory (exporter writes .xlsx)           (US-AF16)
+
+--------------------------------------------------------------------------------
+SECTION 22 — ADMIN SCREENS
+--------------------------------------------------------------------------------
+
+22A. Audit Log Viewer (US-SW01, US-X02)
+  [FXML] views/admin/AuditLogView.fxml
+  [FX:BorderPane]
+    TOP: [FX:HBox] filters: date range pickers + [FX:ComboBox<EventType>] +
+         [FX:TextField] userIdFilter + [FX:Button] "Search"
+    CENTER: [FX:TableView<AuditEntry>]
+      Columns: Timestamp | User ID | Event Type | Details | Outcome
+
+22B. Manage Users / Account Lockout (US-SW02)
+  [FXML] views/admin/ManageUsersView.fxml
+  [FX:TableView<UserAccount>]
+    Columns: User ID | Name | Role | Status (Active / Locked) | Failed Logins
+  [FX:Button] "Unlock Account" (enabled only when selected row is Locked)
+  [FX:Button] "Manage Restrictions"
+
+22C. Registration State Control (State Pattern integration)
+  [FXML] views/admin/RegistrationStateView.fxml
+  [FX:Label]  "Current Registration State: <StateName>"
+  [FX:Button] "Advance State" → AdvanceRegistrationStateCommand
+
+--------------------------------------------------------------------------------
+SECTION 23 — SCHEDULE CONFLICT DETECTION (Iterator Pattern)
+--------------------------------------------------------------------------------
+
+Conflict detection (US-I16) runs inside the Registration Pipeline
+(ScheduleConflictCheck handler) before the UI confirmation is shown.
+
+The algorithm:
+  ScheduleConflictIterator simultaneously walks:
+    - The student's enrolled sections (ordered by day+time)
+    - The proposed section's meeting slots
+  If any day-and-time overlap is found, the handler throws
+  RegistrationHandlerException("Schedule Conflict") with the message:
+    "This section conflicts with <ExistingSection> on <Day> at <Time>."
+  Displayed to the user as an [FX:Alert] AlertType.ERROR.
+
+--------------------------------------------------------------------------------
+SECTION 24 — STYLING NOTES
+--------------------------------------------------------------------------------
+
+CSS file: resources/styles/betteradvisor.css
+
+Color palette:
+  Primary blue:      #1565C0
+  Secondary grey:    #546E7A
+  Success green:     #2E7D32
+  Warning amber:     #F57F17
+  Error red:         #C62828
+  Background:        #F5F5F5
+  Panel background:  #FFFFFF
+  Nav panel:         #37474F (dark slate) with white text
+
+Typography:
+  Body:   System default 13pt
+  Header: Bold 16pt
+  Title:  Bold 22pt
+
+All alert dialogs use the primary blue header bar.
+NavPanel items highlight in primary blue on hover.
+TreeView selected rows highlight in primary blue at 20% opacity.
+
+--------------------------------------------------------------------------------
+SECTION 25 — PACKAGE / FILE STRUCTURE SUGGESTIONS
+--------------------------------------------------------------------------------
+
+src/
+  edu/advising/
+    ui/
+      controllers/
+        LoginController.java
+        DashboardController.java       (base; subclassed by Student/Faculty)
+        CatalogController.java
+        ScheduleController.java
+        RosterController.java
+        GradebookController.java
+        WaitlistController.java
+        SectionSearchController.java
+        PaymentController.java
+        BudgetController.java
+        ProgramEvalController.java
+        EducationalPlanController.java
+        ReportViewerController.java
+        ProfileController.java
+        AdminAuditController.java
+        AdminUsersController.java
+      factories/
+        NavMenuFactory.java            (Abstract Factory)
+        StudentNavMenuFactory.java
+        FacultyNavMenuFactory.java
+        AdminNavMenuFactory.java
+        DashboardFactory.java
+        StudentDashboardFactory.java
+        FacultyDashboardFactory.java
+        NotificationPanelFactory.java
+        ReportOutputFactory.java       (PDF / HTML / Excel families)
+        PdfReportFactory.java
+        HtmlReportFactory.java
+        ExcelReportFactory.java
+      SceneManager.java
+      BetterAdvisorApp.java            (Application subclass, main entry point)
+    resources/
+      views/
+        LoginView.fxml
+        TopBar.fxml
+        NavigationPanel.fxml
+        CatalogView.fxml
+        student/
+          StudentDashboard.fxml
+          StudentScheduleView.fxml
+          EducationalPlanView.fxml
+          ProgramEvalView.fxml
+          PaymentView.fxml
+        faculty/
+          FacultyDashboard.fxml
+          RosterView.fxml
+          GradebookView.fxml
+          BudgetView.fxml
+        admin/
+          AuditLogView.fxml
+          ManageUsersView.fxml
+          RegistrationStateView.fxml
+        WaitlistView.fxml
+        SectionSearchView.fxml
+        ReportViewer.fxml
+        NotificationPanel.fxml
+        ProfileView.fxml
+        PrerequisiteChainPanel.fxml
+      styles/
+        betteradvisor.css
+      images/
+        icons/  (nav icons, status icons, delivery mode icons)
+
+================================================================================
+END OF JAVAFX GUI DESIGN SPECIFICATION
+================================================================================

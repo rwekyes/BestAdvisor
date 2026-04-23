@@ -1,0 +1,100 @@
+---
+title: US-SW01 — Audit Log (System-Wide)
+---
+classDiagram
+
+    %% ── NEW CLASSES ──────────────────────────────────────────────────────────
+
+    class AuditLog {
+        -static AuditLog instance
+        -DatabaseManager db
+        +static getInstance() AuditLog
+        +log(AuditEvent event) void
+        +logLogin(User user, boolean success) void
+        +logPipelineResult(String userId, String pipeline, List~String~ passed, String failedAt, String outcome) void
+        +getEvents(String userId, EventType type, LocalDateTime from, LocalDateTime to) List~AuditEvent~
+    }
+
+    class AuditEvent {
+        -int id
+        -String userId
+        -EventType eventType
+        -String details
+        -String outcome
+        -LocalDateTime timestamp
+        +getId() int
+        +getUserId() String
+        +getEventType() EventType
+        +getDetails() String
+        +getOutcome() String
+        +getTimestamp() LocalDateTime
+    }
+
+    class EventType {
+        <<enumeration>>
+        LOGIN
+        LOGOUT
+        LOGIN_FAILED
+        ACCOUNT_LOCKED
+        COMMAND_EXECUTED
+        COMMAND_UNDONE
+        PIPELINE_RESULT
+        REPORT_GENERATED
+    }
+
+    %% ── EXISTING CLASSES (shown for context) ────────────────────────────────
+
+    class CommandHistory {
+        -Deque~BaseCommand~ undoStack
+        -Deque~BaseCommand~ redoStack
+        -int userId
+        +executeCommand(BaseCommand cmd) void
+        +undo() boolean
+        +redo() boolean
+        +getAuditHistory(int limit) List~CommandRecord~
+    }
+
+    class BaseCommand {
+        <<abstract>>
+        #int id
+        #int userId
+        #String commandType
+        #LocalDateTime executionTime
+        #boolean successful
+        #String errorMessage
+        +execute() void
+        +undo() void
+        +prepareForStorage() void
+    }
+
+    class DatabaseManager {
+        -static DatabaseManager instance
+        +static getInstance() DatabaseManager
+        +upsert(Object entity) void
+        +fetchList(String sql, ...) List
+    }
+
+    class User {
+        #int id
+        #String username
+        #String userType
+        +getId() int
+        +getUsername() String
+        +getUserType() String
+    }
+
+    %% ── RELATIONSHIPS ────────────────────────────────────────────────────────
+
+    AuditLog "1" --> "1" DatabaseManager      : persists via
+    AuditLog       -->    AuditEvent           : creates
+    AuditLog       -->    EventType            : uses
+
+    %% CommandHistory already logs commands; it delegates login/pipeline events
+    %% to AuditLog so both sources feed one unified audit table.
+    CommandHistory --> AuditLog               : notifies on execute / undo
+
+    BaseCommand <|-- RegisterCommand
+    BaseCommand <|-- DropCommand
+    BaseCommand <|-- PaymentCommand
+
+    AuditEvent --> User                       : identified by userId

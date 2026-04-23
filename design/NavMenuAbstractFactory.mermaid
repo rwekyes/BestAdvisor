@@ -1,0 +1,174 @@
+---
+title: US-AF03 — Student / Faculty / Admin Navigation Menu (Abstract Factory Pattern)
+---
+classDiagram
+
+    %% ── ABSTRACT FACTORY ─────────────────────────────────────────────────────
+
+    class NavMenuFactory {
+        <<interface>>
+        +createMenuItems() List~NavItem~
+        +createDashboard() DashboardWidget
+        +createNotificationPanel() NotificationPanel
+        +createQuickActionsPanel() QuickActionsPanel
+    }
+
+    %% ── CONCRETE FACTORIES ───────────────────────────────────────────────────
+
+    class StudentNavMenuFactory {
+        +createMenuItems() List~NavItem~
+        +createDashboard() DashboardWidget
+        +createNotificationPanel() NotificationPanel
+        +createQuickActionsPanel() QuickActionsPanel
+    }
+
+    class FacultyNavMenuFactory {
+        +createMenuItems() List~NavItem~
+        +createDashboard() DashboardWidget
+        +createNotificationPanel() NotificationPanel
+        +createQuickActionsPanel() QuickActionsPanel
+    }
+
+    class AdminNavMenuFactory {
+        +createMenuItems() List~NavItem~
+        +createDashboard() DashboardWidget
+        +createNotificationPanel() NotificationPanel
+        +createQuickActionsPanel() QuickActionsPanel
+    }
+
+    %% ── FACTORY PROVIDER ─────────────────────────────────────────────────────
+
+    class NavMenuFactoryProvider {
+        +static getFactory(String userType) NavMenuFactory
+    }
+
+    %% ── ABSTRACT PRODUCTS ────────────────────────────────────────────────────
+
+    class NavItem {
+        -String label
+        -String sceneKey
+        -String iconPath
+        +NavItem(String label, String sceneKey, String iconPath)
+        +getLabel() String
+        +getSceneKey() String
+        +getIconPath() String
+    }
+
+    class DashboardWidget {
+        <<interface>>
+        +render() void
+        +refresh() void
+    }
+
+    class NotificationPanel {
+        <<interface>>
+        +getFilteredTypes() List~String~
+        +render() void
+    }
+
+    class QuickActionsPanel {
+        <<interface>>
+        +getButtons() List~NavItem~
+        +render() void
+    }
+
+    %% ── CONCRETE PRODUCTS — Student ──────────────────────────────────────────
+
+    class StudentDashboardWidget {
+        -Student student
+        +render() void
+        +refresh() void
+    }
+
+    class StudentNotificationPanel {
+        +getFilteredTypes() List~String~
+        +render() void
+    }
+
+    class StudentQuickActionsPanel {
+        +getButtons() List~NavItem~
+        +render() void
+    }
+
+    %% ── CONCRETE PRODUCTS — Faculty ──────────────────────────────────────────
+
+    class FacultyDashboardWidget {
+        -Faculty faculty
+        +render() void
+        +refresh() void
+    }
+
+    class FacultyNotificationPanel {
+        +getFilteredTypes() List~String~
+        +render() void
+    }
+
+    class FacultyQuickActionsPanel {
+        +getButtons() List~NavItem~
+        +render() void
+    }
+
+    %% ── EXISTING DOMAIN CLASSES ──────────────────────────────────────────────
+
+    class User {
+        #int id
+        #String userType
+        +getUserType() String
+    }
+
+    class Student {
+        #String studentId
+        #BigDecimal gpa
+        +getStudentId() String
+    }
+
+    class Faculty {
+        #String employeeId
+        #String department
+        +getEmployeeId() String
+    }
+
+    class Admin {
+    }
+
+    %% ── RELATIONSHIPS ────────────────────────────────────────────────────────
+
+    NavMenuFactory <|.. StudentNavMenuFactory
+    NavMenuFactory <|.. FacultyNavMenuFactory
+    NavMenuFactory <|.. AdminNavMenuFactory
+
+    NavMenuFactoryProvider --> NavMenuFactory : creates correct factory
+    NavMenuFactoryProvider --> User           : inspects userType
+
+    %% Abstract product hierarchies
+    DashboardWidget    <|.. StudentDashboardWidget
+    DashboardWidget    <|.. FacultyDashboardWidget
+    NotificationPanel  <|.. StudentNotificationPanel
+    NotificationPanel  <|.. FacultyNotificationPanel
+    QuickActionsPanel  <|.. StudentQuickActionsPanel
+    QuickActionsPanel  <|.. FacultyQuickActionsPanel
+
+    %% Factories create their matching product family
+    StudentNavMenuFactory --> StudentDashboardWidget    : creates
+    StudentNavMenuFactory --> StudentNotificationPanel  : creates
+    StudentNavMenuFactory --> StudentQuickActionsPanel  : creates
+    StudentNavMenuFactory --> NavItem                   : creates student items
+
+    FacultyNavMenuFactory --> FacultyDashboardWidget    : creates
+    FacultyNavMenuFactory --> FacultyNotificationPanel  : creates
+    FacultyNavMenuFactory --> FacultyQuickActionsPanel  : creates
+    FacultyNavMenuFactory --> NavItem                   : creates faculty items
+
+    AdminNavMenuFactory   --> NavItem                   : creates all items
+
+    %% Domain relationships
+    User <|-- Student
+    User <|-- Faculty
+    User <|-- Admin
+
+    StudentDashboardWidget --> Student : reads data from
+    FacultyDashboardWidget --> Faculty : reads data from
+
+    %% Note: AdminNavMenuFactory reuses StudentNavMenuFactory and
+    %% FacultyNavMenuFactory item lists and appends admin-only items on top,
+    %% satisfying US-AF05 without duplicating item definitions.

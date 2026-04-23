@@ -1,0 +1,124 @@
+---
+title: US-C01 — Schedule of Classes / Catalog Hierarchy (Composite Pattern)
+---
+classDiagram
+
+    %% ── COMPOSITE INTERFACE ──────────────────────────────────────────────────
+
+    class CatalogNode {
+        <<interface>>
+        +getDisplayName() String
+        +getTotalCredits() double
+        +getTotalSections() int
+        +getChildren() List~CatalogNode~
+        +isLeaf() boolean
+    }
+
+    %% ── COMPOSITE BRANCHES ───────────────────────────────────────────────────
+
+    class CollegeNode {
+        -String name
+        -List~DepartmentNode~ departments
+        +getDisplayName() String
+        +getTotalCredits() double
+        +getTotalSections() int
+        +getChildren() List~CatalogNode~
+        +isLeaf() boolean
+        +addDepartment(DepartmentNode d) void
+    }
+
+    class DepartmentNode {
+        -Department department
+        -List~CourseNode~ courses
+        +getDisplayName() String
+        +getTotalCredits() double
+        +getTotalSections() int
+        +getChildren() List~CatalogNode~
+        +isLeaf() boolean
+        +getDepartment() Department
+        +addCourse(CourseNode c) void
+    }
+
+    class CourseNode {
+        -Course course
+        -List~SectionNode~ sections
+        +getDisplayName() String
+        +getTotalCredits() double
+        +getTotalSections() int
+        +getChildren() List~CatalogNode~
+        +isLeaf() boolean
+        +getCourse() Course
+        +addSection(SectionNode s) void
+    }
+
+    %% ── COMPOSITE LEAF ───────────────────────────────────────────────────────
+
+    class SectionNode {
+        -Section section
+        +getDisplayName() String
+        +getTotalCredits() double
+        +getTotalSections() int
+        +getChildren() List~CatalogNode~
+        +isLeaf() boolean
+        +getSection() Section
+        +getInstructor() String
+        +getMeetingDays() String
+        +getStartTime() String
+        +getEndTime() String
+        +getRoom() String
+        +getAvailableSeats() int
+        +getDeliveryMode() String
+    }
+
+    %% ── EXISTING DOMAIN CLASSES (wrapped by the nodes) ──────────────────────
+
+    class Department {
+        -int id
+        -String code
+        -String name
+        -double budget
+        +getCourses() List~Course~
+    }
+
+    class Course {
+        -int id
+        -String code
+        -String name
+        -double credits
+        -int departmentId
+        +getSections() List~Section~
+        +getCredits() double
+    }
+
+    class Section {
+        -int id
+        -String sectionNumber
+        -int capacity
+        -int enrolled
+        -String status
+        +hasCapacity() boolean
+        +getAvailableSeats() int
+        +getFaculty() Faculty
+    }
+
+    %% ── RELATIONSHIPS ────────────────────────────────────────────────────────
+
+    CatalogNode <|.. CollegeNode
+    CatalogNode <|.. DepartmentNode
+    CatalogNode <|.. CourseNode
+    CatalogNode <|.. SectionNode
+
+    %% Composite containment (parent *-- children)
+    CollegeNode    "1" *-- "many" DepartmentNode : contains
+    DepartmentNode "1" *-- "many" CourseNode     : contains
+    CourseNode     "1" *-- "many" SectionNode    : contains
+
+    %% Nodes wrap existing domain objects
+    DepartmentNode --> Department : wraps
+    CourseNode     --> Course     : wraps
+    SectionNode    --> Section    : wraps
+
+    %% Note: credit/section roll-up is computed bottom-up.
+    %% CollegeNode.getTotalCredits() sums DepartmentNode.getTotalCredits(),
+    %% which sums CourseNode.getTotalCredits() (= course.getCredits() × sections),
+    %% so the leaf value always bubbles to the root automatically.

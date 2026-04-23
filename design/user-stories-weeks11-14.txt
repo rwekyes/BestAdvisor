@@ -1,0 +1,587 @@
+================================================================================
+BetterAdvisor — User Stories: Weeks 11–14 + System-Wide Features
+================================================================================
+Format: As a <role>, I want <goal>, so that <benefit>.
+Acceptance criteria follow each story.
+
+--------------------------------------------------------------------------------
+WEEK 11 — COMPOSITE PATTERN
+--------------------------------------------------------------------------------
+
+US-C01: Schedule of Classes — Catalog Hierarchy Display
+As a student, I want to browse the course catalog as an expandable tree
+(College → Department → Course → Section), so that I can navigate to the
+section I need without losing my place in the hierarchy.
+  AC1: The root level shows all colleges.
+  AC2: Expanding a college shows its departments; expanding a department shows
+       its courses; expanding a course shows its sections.
+  AC3: Each parent node automatically displays the sum of credits and the total
+       section count of all its children.
+  AC4: Collapsing a node hides all descendants.
+
+US-C02: Course Search within the Catalog
+As a student, I want to search the catalog tree by course code or keyword,
+so that I can find matching sections no matter where they appear in the
+hierarchy.
+  AC1: A search box is present on the catalog screen.
+  AC2: Entering a course code (e.g., "CIS 18") or keyword returns all matching
+       sections across all colleges and departments.
+  AC3: Results display the full path (College / Department / Course / Section)
+       for each match.
+  AC4: Selecting a result expands the tree to that section.
+
+US-C03: Program Requirements Tree
+As a student, I want to see my degree requirements as a hierarchy of groups,
+sub-groups, and individual courses, so that I always know how much of my
+degree I have completed at every level.
+  AC1: Top-level groups (e.g., "Core Requirements", "Electives") are displayed.
+  AC2: Each group shows credit totals and a completion percentage calculated
+       from its children.
+  AC3: Completed courses are visually distinguished from remaining ones.
+  AC4: Credit totals roll up correctly through every level when a course is
+       marked complete.
+
+US-C04: My Educational Plan
+As a student, I want to organize my future course plan into planned semesters
+each containing planned courses, so that I can see how my credits are
+distributed across semesters.
+  AC1: Each planned semester node shows the total credits of its planned
+       courses, updated automatically.
+  AC2: A student can add or remove planned courses within any semester.
+  AC3: The overall plan node shows total planned credits across all semesters.
+
+US-C05: Prerequisite Chain Display
+As a student, I want to see a course's full prerequisite chain displayed as
+a nested tree, so that I understand exactly what I need to complete before
+I can enroll.
+  AC1: Prerequisites that themselves have prerequisites are shown as nested
+       child nodes.
+  AC2: Courses the student has already completed are visually distinguished.
+  AC3: The tree expands automatically to show the deepest dependency level.
+
+US-C06: Section Detail Leaf
+As a student, I want to view the specific details of a course section—
+instructor, meeting days/times, room, building, total seats, enrolled count,
+waitlist count, and delivery mode—so that I can make an informed enrollment
+decision.
+  AC1: All listed fields are shown when a section leaf node is selected.
+  AC2: Seat availability is calculated as (total seats − enrolled count).
+  AC3: Delivery mode is labeled clearly (In-Person, Online, Hybrid).
+
+US-C07: Budget Category Hierarchy (Faculty)
+As a faculty member, I want to view my department's budget as a hierarchy of
+categories and line items, so that I can see how funds are distributed and
+where money has been spent.
+  AC1: Top-level budget categories (e.g., "Personnel", "Equipment") are shown.
+  AC2: Each category node rolls up the allocated, spent, and remaining amounts
+       of its children.
+  AC3: Individual line items (leaves) show their own allocated, spent, and
+       remaining amounts.
+
+US-C08: Budget Summary Display (Faculty)
+As a faculty member, I want to see the entire department budget tree with
+aggregated totals at every level in one unified view, so that I can assess
+both the big picture and specific line items simultaneously.
+  AC1: The tree is shown fully expanded by default.
+  AC2: Each node displays allocated, spent, and remaining in clearly labeled
+       columns.
+  AC3: The root node shows department-wide totals.
+
+--------------------------------------------------------------------------------
+WEEK 12 — ITERATOR PATTERN
+--------------------------------------------------------------------------------
+
+US-I01: My Class Schedule — Weekly View
+As a student, I want my enrolled sections presented in a weekly grid ordered
+Monday through Friday by start time, so that I can see my week at a glance.
+  AC1: Sections are shown in day order (Mon → Fri) then by start time.
+  AC2: Overlapping sections are flagged visually.
+  AC3: Online/async sections are shown in a separate "Async" row.
+
+US-I02: My Class Schedule — By Semester
+As a student, I want to browse my full enrollment history grouped by semester,
+so that I can review what I took in any past term.
+  AC1: Each semester is a collapsible group showing its sections together.
+  AC2: Semesters are ordered most recent first.
+
+US-I03: My Class Schedule — By Delivery Mode
+As a student, I want to filter my schedule to show only online, only
+in-person, or only hybrid sections, so that I can plan around my location
+constraints.
+  AC1: A filter control with three options (Online, In-Person, Hybrid) is
+       available on the schedule screen.
+  AC2: Selecting a mode hides all sections that do not match.
+  AC3: "All" mode shows every section regardless of delivery.
+
+US-I04: My Class Schedule — By Status
+As a student, I want to filter my enrollments by status (Active, Dropped,
+Withdrawn), so that I can review only the relevant subset of my records.
+  AC1: A status filter is available on the schedule screen.
+  AC2: Only enrollments matching the selected status are displayed.
+
+US-I05: Class Roster — Alphabetical (Faculty)
+As a faculty member, I want to view the roster for my section sorted
+alphabetically by student last name, so that I can quickly locate any student.
+  AC1: The roster list is ordered A → Z by last name, then by first name as
+       a tiebreaker.
+
+US-I06: Class Roster — By Student ID (Faculty)
+As a faculty member, I want the roster sorted by student ID, so that I can
+cross-reference institutional records efficiently.
+  AC1: The roster is sorted numerically by student ID in ascending order.
+
+US-I07: Class Roster — By Credits Earned (Faculty)
+As a faculty member, I want the roster sorted from fewest to most credits
+earned, so that I can easily identify students who may need additional support.
+  AC1: Students are sorted in ascending order of total credits earned.
+  AC2: Credits earned are visible in the roster row.
+
+US-I08: Class Roster — By Enrollment Date (Faculty)
+As a faculty member, I want the roster ordered by the date each student
+registered, so that I can see who enrolled earliest.
+  AC1: Enrollment date is shown per row and used as the sort key ascending.
+
+US-I09: Gradebook — Missing Grades View (Faculty)
+As a faculty member, I want a filtered view of my gradebook showing only
+students who have not yet received a grade, so that I can quickly identify
+who still needs grading.
+  AC1: Only students with no submitted grade for the selected section appear.
+  AC2: A count of ungraded students is shown at the top of the list.
+
+US-I10: Gradebook — By Grade (Faculty)
+As a faculty member, I want to view my gradebook sorted from highest to
+lowest grade, so that I can review grade distribution at a glance.
+  AC1: Grades are ordered highest → lowest (A, A−, B+, … F, W, I, P, NP).
+  AC2: Students with no grade yet appear at the bottom, labeled "Not Graded".
+
+US-I11: Waitlist — By Priority Order
+As a student, I want the waitlist for a section displayed in position order
+(first in line first), so that I can see where I stand.
+  AC1: Position numbers are shown (1, 2, 3, …).
+  AC2: When a seat opens, the student in position 1 is automatically promoted.
+
+US-I12: Waitlist — Permission to Add (Faculty)
+As a faculty member, I want to see a separate list of waitlisted students I
+have approved for a permission-to-add, so that I can track and act on my
+approvals distinctly from the general waitlist.
+  AC1: Only students the faculty member has explicitly approved appear in this
+       view.
+  AC2: The faculty member can revoke a permission-to-add from this list.
+
+US-I13: Section Search Results — By Availability
+As a student, I want section search results surfaced with open-seat sections
+first, so that I can quickly find sections I can actually enroll in.
+  AC1: Sections with at least one open seat appear before full sections.
+  AC2: Full sections are clearly labeled.
+
+US-I14: Section Search Results — By Instructor
+As a student, I want to sort section search results alphabetically by
+instructor last name, so that I can find a specific instructor's sections.
+  AC1: Results are ordered A → Z by instructor last name.
+
+US-I15: Section Search Results — Online First
+As a student, I want online sections listed before in-person sections in
+search results, so that I can quickly identify remote options.
+  AC1: Online sections appear at the top; in-person and hybrid follow.
+
+US-I16: Schedule Conflict Detection
+As a student, I want the system to check my current schedule against a
+proposed new section and flag any day-and-time overlaps before I enroll,
+so that I never accidentally create a schedule conflict.
+  AC1: The system compares meeting days and times of all enrolled sections
+       against the proposed section.
+  AC2: If an overlap is found, the conflicting section name and times are
+       shown before the enrollment is submitted.
+  AC3: The student can choose to cancel or to proceed to the waitlist if the
+       target section is full.
+
+--------------------------------------------------------------------------------
+WEEK 13 — ABSTRACT FACTORY PATTERN
+--------------------------------------------------------------------------------
+
+US-AF01: Student Dashboard
+As a student, when I log in I want to see a dashboard assembled specifically
+for students—upcoming schedule widget, GPA/credits widget, account balance
+widget, and unread notification count—so that the most relevant information
+is immediately visible.
+  AC1: All four widgets are present and populated on student login.
+  AC2: No faculty-specific widgets appear.
+
+US-AF02: Faculty Dashboard
+As a faculty member, when I log in I want to see a dashboard assembled
+specifically for faculty—today's sections widget, unsubmitted grades widget,
+unread notifications widget, and budget remaining widget—so that my
+immediate priorities are front and center.
+  AC1: All four widgets are present and populated on faculty login.
+  AC2: No student-specific widgets appear.
+
+US-AF03: Student Navigation Menu
+As a student, I want my navigation menu to contain only student-relevant
+items (My Schedule, Register for Classes, Grades, Financial Information,
+Financial Aid, Transcript, Program Evaluation, My Educational Plan,
+Documents, Restrictions), so that I am not confused by faculty or admin
+options.
+  AC1: Exactly the listed items appear; no faculty or admin items are present.
+
+US-AF04: Faculty Navigation Menu
+As a faculty member, I want my navigation menu to contain only faculty-
+relevant items (My Schedule, Class Roster, Submit Grades, Section Search,
+Student Profiles, Permission to Add, Budget Summary, Documents), so that I
+can navigate efficiently without irrelevant options.
+  AC1: Exactly the listed items appear; no student or admin items are present.
+
+US-AF05: Admin Navigation Menu
+As an administrator, I want my navigation menu to include all student and
+faculty items plus administrative tools (Manage Users, Audit Log, Advance
+Registration State, Manage Restrictions, System Configuration), so that I
+can access every function from one place.
+  AC1: All student items, all faculty items, and all listed admin-only items
+       appear.
+
+US-AF06: Student Notification Panel
+As a student, I want my notification panel to prominently surface grade
+alerts, registration confirmations, and financial aid updates, so that I
+never miss a critical academic or financial event.
+  AC1: Notifications are tagged by type (Grade, Registration, Financial Aid).
+  AC2: Unread count is shown in the panel header.
+  AC3: Faculty-only alert types are not shown.
+
+US-AF07: Faculty Notification Panel
+As a faculty member, I want my notification panel to prominently surface
+grade submission deadline alerts, roster change notifications, and budget
+alerts, so that I can respond to time-sensitive faculty responsibilities.
+  AC1: Notifications are tagged by type (Grade Deadline, Roster Change,
+       Budget Alert).
+  AC2: Student-only alert types are not shown.
+
+US-AF08: Student Report Viewer
+As a student, I want the report viewer to offer only student-appropriate
+reports (Unofficial Transcript, Transcript Request Status, Tax Document,
+Finance Summary, Payment Receipts), so that I cannot accidentally access
+faculty-only data.
+  AC1: Only the listed reports are available in the student report viewer.
+  AC2: Faculty reports are not accessible.
+
+US-AF09: Faculty Report Viewer
+As a faculty member, I want the report viewer to offer only faculty-
+appropriate reports (Class Roster, Census Roster, Gradebook, Budget
+Summary), so that student-only reports are not present.
+  AC1: Only the listed reports are available in the faculty report viewer.
+  AC2: Student-only reports are not accessible.
+
+US-AF10: Student Profile Panel
+As a student, I want my profile panel to display my name, student ID,
+declared major, GPA, credits earned, advisor name, and enrollment status,
+with phone, address, and email as editable fields, so that I can keep my
+contact information current.
+  AC1: All listed read-only fields are visible and non-editable.
+  AC2: Phone, address, and email fields are editable and saved on submit.
+  AC3: Faculty-specific fields (office location, title) are not present.
+
+US-AF11: Faculty Profile Panel
+As a faculty member, I want my profile panel to display my name, faculty ID,
+department, title, office location, and office hours, with phone, email, and
+office hours as editable fields, so that students can find accurate contact
+information.
+  AC1: All listed read-only fields are visible and non-editable.
+  AC2: Phone, email, and office hours fields are editable and saved on submit.
+  AC3: Student-specific fields (GPA, credits) are not present.
+
+US-AF12: Student Quick Actions Panel
+As a student, I want a panel of large shortcut buttons for my most common
+tasks (Register for Classes, Pay Balance, View Grades, Order Transcript),
+so that I can complete routine actions in one click.
+  AC1: All four buttons are present and navigate to the correct screen.
+  AC2: Faculty-specific buttons are not shown.
+
+US-AF13: Faculty Quick Actions Panel
+As a faculty member, I want a panel of large shortcut buttons for my most
+common tasks (View Roster, Submit Grades, View Schedule, Budget Summary),
+so that I can reach high-frequency functions immediately.
+  AC1: All four buttons are present and navigate to the correct screen.
+  AC2: Student-specific buttons are not shown.
+
+US-AF14: Report Output — PDF Family
+As a user, when I request PDF output, I want the renderer, formatter, and
+exporter all produced as a consistent PDF family, so that the generated file
+is well-formatted and opens in standard PDF viewers.
+  AC1: Output is a valid .pdf file.
+  AC2: Formatting (fonts, tables, headers) is consistent with the PDF family
+       style.
+
+US-AF15: Report Output — HTML Family
+As a user, when I request on-screen output, I want a consistent HTML-
+rendering family, so that the report displays correctly in the application
+window.
+  AC1: Output renders in the in-app viewer without external tools.
+  AC2: All report components use the HTML family's consistent styling.
+
+US-AF16: Report Output — Excel Family
+As a faculty member, when I export a roster, I want a consistent
+spreadsheet-producing family, so that the file can be imported directly
+into an LMS or other external tool.
+  AC1: Output is a valid .xlsx file.
+  AC2: Columns are labeled and data is in plain tabular format suitable for
+       LMS import.
+
+--------------------------------------------------------------------------------
+WEEK 14 — CHAIN OF RESPONSIBILITY PATTERN
+--------------------------------------------------------------------------------
+
+-- Registration Validation Pipeline --
+
+US-R01: Authentication Check (Registration)
+As a student attempting to register, I want the system to verify I am
+logged in before processing my request, so that unauthorized registrations
+are impossible.
+  AC1: If the session is invalid, the request is immediately stopped and the
+       student is redirected to the login screen.
+  AC2: No subsequent checks run if this check fails.
+
+US-R02: Registration Window Check
+As a student, I want to be told immediately if registration is not currently
+open, including when it will open, so that I am not confused by a silent
+failure.
+  AC1: If registration is closed, the exact open date/time is shown.
+  AC2: No subsequent checks run if this check fails.
+
+US-R03: Permission / Hold Check (Registration)
+As a student, I want to know if an active hold is blocking my registration,
+including the specific hold name and where to go to resolve it, so that I
+can take immediate action.
+  AC1: The specific hold name is shown (e.g., "Library Hold").
+  AC2: A resolution location or office is provided.
+  AC3: No subsequent checks run if this check fails.
+
+US-R04: Prerequisite Check
+As a student, I want a clear list of any missing prerequisites when I try
+to register for a course, so that I know exactly what I need to complete
+first.
+  AC1: Every missing prerequisite is listed by course code and name.
+  AC2: Prerequisites already completed are not listed.
+
+US-R05: Corequisite Check
+As a student, I want to be told if I need to enroll in a corequisite
+alongside this course, so that I can add it to my cart in the same session.
+  AC1: The required corequisite's name and code are shown.
+  AC2: If the corequisite is already enrolled or completed, this check passes
+       silently.
+
+US-R06: Schedule Conflict Check (Registration Pipeline)
+As a student, I want the pipeline to stop and name the conflicting section
+if my new section overlaps an existing one, so that I never accidentally
+create a time conflict.
+  AC1: The conflicting section name, days, and times are shown.
+  AC2: The new enrollment does not proceed while the conflict exists.
+
+US-R07: Credit Limit Check
+As a student, I want to be informed if adding a section would exceed my
+semester credit maximum, and told my current total and how to request an
+override, so that I know my options.
+  AC1: Current credit total and the maximum allowed are shown.
+  AC2: Contact information or a link for an advisor override is provided.
+
+US-R08: Financial Hold Check
+As a student, I want to know if a financial hold is blocking my registration,
+including the hold name and a direction to the Bursar's Office, so that I
+can resolve it promptly.
+  AC1: The financial hold name is shown.
+  AC2: "Contact the Bursar's Office" with contact info is displayed.
+
+US-R09: Academic Hold Check
+As a student, I want to be told if an academic hold is blocking my
+registration and directed to the appropriate office, so that I know exactly
+who can resolve it.
+  AC1: The academic hold name is shown.
+  AC2: The appropriate office name is provided.
+
+US-R10: Duplicate Enrollment Check
+As a student, I want the system to inform me if I am already enrolled in a
+different section of the same course, so that I do not accidentally double-
+register for the same subject.
+  AC1: The course name and the section already enrolled in are shown.
+  AC2: The request is stopped; the student may drop the existing section first.
+
+US-R11: Seat Availability Check / Waitlist Routing
+As a student, I want to be automatically routed to the waitlist when a
+section is full rather than receiving a hard failure, so that I retain my
+spot in line.
+  AC1: If the section is full, the request is flagged for waitlist routing
+       instead of being rejected outright.
+  AC2: The student is informed they have been added to the waitlist at
+       position N.
+
+-- Grade Submission Pipeline --
+
+US-G01: Authentication Check (Grading)
+As a faculty member submitting a grade, I want the system to confirm I am
+logged in before accepting my submission, so that unauthorized grade changes
+are prevented.
+  AC1: An invalid session stops the pipeline and redirects to login.
+
+US-G02: Permission Check (Grading)
+As a faculty member, I want the system to confirm I have grade submission
+permission before accepting my submission.
+  AC1: Lack of permission shows a clear denial message.
+
+US-G03: Section Ownership Check
+As a faculty member, I want the system to verify that I am the instructor
+of record for the section I am grading, so that I cannot modify grades in
+sections I do not teach.
+  AC1: Attempting to grade a section not assigned to the faculty member is
+       blocked with an explanatory message.
+
+US-G04: Grading Window Check
+As a faculty member, I want to be told if the grading period is closed—
+including when it was or when it opens—so that I understand the timing
+constraint.
+  AC1: Deadline or open-date information is shown when the window is closed.
+
+US-G05: Valid Grade Value Check
+As a faculty member, I want a clear error if I enter an unrecognized grade
+symbol, along with a list of valid symbols, so that I can correct my input
+immediately.
+  AC1: All valid grade symbols (A, B, C, D, F, W, I, P, NP, etc.) are
+       listed in the error message.
+
+US-G06: Grades Not Finalized Check
+As a faculty member, I want the system to block any further grade changes
+once a section's grades have been finalized, so that official records remain
+immutable.
+  AC1: Attempting to change a finalized grade shows a "Grades Finalized"
+       message with no edit option.
+
+-- Payment Processing Pipeline --
+
+US-P01: Authentication Check (Payment)
+As a student making a payment, I want the system to confirm I am logged in
+before processing any transaction.
+  AC1: Invalid session stops the pipeline and redirects to login.
+
+US-P02: Payment Permission Check
+As a student, I want the system to verify I have permission to make payments
+before processing my transaction.
+  AC1: Lack of permission shows a clear denial message.
+
+US-P03: Positive Amount Check
+As a student, I want the system to reject a payment of zero or a negative
+amount, so that invalid transactions never reach the gateway.
+  AC1: Any amount ≤ 0 is rejected with a message indicating the amount must
+       be positive.
+
+US-P04: Amount Reasonableness Check
+As a student, I want a warning if my payment exceeds my current balance due,
+so that I can confirm before accidentally overpaying.
+  AC1: The current balance due is shown alongside the warning.
+  AC2: The student can choose to continue or cancel.
+
+US-P05: Payment Method Validation Check
+As a student paying by credit card, I want the system to verify the card
+number format, expiration date, and CVV before submitting to the gateway,
+so that obvious errors are caught early.
+  AC1: Invalid card number format: show error.
+  AC2: Expiration date in the past: show error.
+  AC3: CVV wrong length: show error.
+
+US-P06: Daily Limit Check
+As a student, I want to be informed and directed to the Bursar's Office if
+a payment would exceed the daily fraud-prevention limit, so that I have a
+clear next step.
+  AC1: The daily limit and the current day's total are shown.
+  AC2: Bursar's Office contact information is provided.
+
+US-P07: External Gateway Availability Check
+As a student, I want a friendly message telling me the payment system is
+temporarily unavailable and suggesting I try again shortly, so that I am
+not left confused by a silent failure.
+  AC1: A human-readable unavailability message is displayed.
+  AC2: No partial transaction is recorded.
+
+-- Cross-Pipeline Features --
+
+US-X01: Specific, Actionable Error Messages
+As any user whose request is stopped by a pipeline check, I want every
+failure message to tell me precisely what went wrong and exactly what I need
+to do to resolve it, so that I never see a generic error.
+  AC1: Every handler's failure message names the specific issue and provides
+       a resolution step.
+  AC2: Generic error strings ("An error occurred") are never shown to the
+       user.
+
+US-X02: Pipeline Audit Log
+As an administrator, I want every pipeline request logged—showing which
+handlers it passed, which it failed at, the timestamp, and the requesting
+user—so that I can audit and troubleshoot registration, grading, and
+payment activity.
+  AC1: Every pipeline run creates an audit log entry.
+  AC2: The entry includes: user ID, timestamp, pipeline type, handlers
+       passed (list), handler failed at (or "all passed"), and outcome.
+  AC3: The audit log is viewable from the Admin navigation menu.
+
+US-X03: Request Passes All Checks
+As a user whose request clears every handler in the pipeline, I want the
+intended command (register, submit grade, make payment) to execute
+automatically as the final step, so that I do not need to take an additional
+action after validation succeeds.
+  AC1: On full pipeline pass, the command executes and a success confirmation
+       is shown.
+
+--------------------------------------------------------------------------------
+SYSTEM-WIDE FEATURES
+--------------------------------------------------------------------------------
+
+US-SW01: Audit Log
+As an administrator, I want every login, logout, failed login attempt,
+command execution, undo, report generation, and pipeline result written to
+a central audit log with timestamp and user ID, so that I have a complete
+record of system activity.
+  AC1: All listed event types are captured.
+  AC2: Each entry includes timestamp (date + time to the second) and user ID.
+  AC3: The audit log is searchable and filterable by event type, user, and
+       date range.
+
+US-SW02: Account Lockout
+As an administrator, I want user accounts locked automatically after five
+consecutive failed login attempts, requiring admin unlock, so that brute-
+force login attacks are prevented.
+  AC1: Exactly five consecutive failures trigger a lock (not four, not six).
+  AC2: A locked account cannot log in until an admin unlocks it.
+  AC3: An unlock action is available in the admin Manage Users screen.
+  AC4: The lockout and unlock events are written to the audit log.
+
+US-SW03: Session Management
+As the system, I want a session token created on login and invalidated on
+logout, so that any feature access without a valid session redirects to the
+login screen.
+  AC1: Every protected route checks for a valid session token.
+  AC2: An expired or absent token redirects to login with a message.
+  AC3: Logout immediately invalidates the token server-side.
+
+US-SW04: Transactional Data Integrity
+As a user performing any write operation, I want every database write to
+either complete fully or roll back completely, so that partial data states
+never occur.
+  AC1: If any part of a multi-step write fails, all changes are rolled back.
+  AC2: The user receives an error message and is told to retry.
+  AC3: No partial records appear in any view after a failed operation.
+
+US-SW05: Access Denied Handling
+As any user who attempts to reach a feature they are not permitted to access,
+I want a clear explanation of why access was denied and what I should do,
+so that I never see a blank screen or generic error.
+  AC1: The message names the feature and states the reason access is denied.
+  AC2: A suggested next step (e.g., "Contact your advisor") is provided.
+  AC3: Generic error pages are never shown for permission failures.
+
+US-SW06: Development Seed Data
+As a developer, I want a script that populates the database with sample
+students, faculty, departments, courses, and sections, so that I can test
+all features without manually entering data.
+  AC1: Running the script produces at least: 3 colleges, 9 departments,
+       30 courses, 60 sections, 20 student accounts, and 10 faculty accounts.
+  AC2: The script is idempotent (running it twice does not duplicate data).
+  AC3: Instructions for running the script are in the project README.
+
+================================================================================
+END OF USER STORIES
+================================================================================
