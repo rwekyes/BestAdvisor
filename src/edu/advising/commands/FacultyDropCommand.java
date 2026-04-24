@@ -37,6 +37,9 @@ package edu.advising.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.advising.audit.AuditEvent;
+import edu.advising.audit.AuditLog;
+import edu.advising.audit.EventType;
 import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.notifications.ObservableStudent;
@@ -154,6 +157,20 @@ public class FacultyDropCommand extends BaseCommand {
             errorMessage = "Faculty drop failed: " + e.getMessage();
             System.err.println("✗ " + errorMessage);
         }
+
+        AuditLog.getInstance().log(new AuditEvent(
+                0,                          // id — 0 means "not persisted yet"
+                userId,
+                EventType.COMMAND_EXECUTED,
+                "ENROLLMENT",
+                this.droppedEnrollmentId,
+                serializeCommandData(),
+                null,
+                null,
+                LocalDateTime.now()
+        ));
+
+
     }
 
     // -------------------------------------------------------------------------
@@ -182,6 +199,19 @@ public class FacultyDropCommand extends BaseCommand {
         } else {
             System.out.printf("✗ Cannot undo — %s is now full.%n", section.getCourseCode());
         }
+
+        AuditLog.getInstance().log(new AuditEvent(
+                0,                          // id — 0 means "not persisted yet"
+                userId,
+                EventType.COMMAND_UNDONE,
+                "ENROLLMENT",
+                this.droppedEnrollmentId,
+                serializeCommandData(),
+                null,
+                null,
+                LocalDateTime.now()
+        ));
+
     }
 
     @Override

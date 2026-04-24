@@ -1,6 +1,9 @@
 package edu.advising.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import edu.advising.audit.AuditEvent;
+import edu.advising.audit.AuditLog;
+import edu.advising.audit.EventType;
 import edu.advising.contexts.EnrollmentContext;
 import edu.advising.contexts.FacultyPermissionContext;
 import edu.advising.contexts.RegistrationPeriodContext;
@@ -119,6 +122,19 @@ public class RegisterCommand extends BaseCommand {
             successful   = false;
             errorMessage = "Already enrolled or duplicate registration prevented.";
         }
+
+        AuditLog.getInstance().log(new AuditEvent(
+                0,                          // id — 0 means "not persisted yet"
+                userId,
+                EventType.COMMAND_EXECUTED,
+                "ENROLLMENT",
+                this.enrollmentId,
+                null,
+                serializeCommandData(),
+                null,
+                LocalDateTime.now()
+        ));
+
     }
 
     @Override
@@ -136,6 +152,18 @@ public class RegisterCommand extends BaseCommand {
             // Notify about drop
             notificationManager.notifyRegistration(student, section.getCourseCode(), false);
         }
+
+        AuditLog.getInstance().log(new AuditEvent(
+                0,                          // id — 0 means "not persisted yet"
+                userId,
+                EventType.COMMAND_UNDONE,
+                "ENROLLMENT",
+                this.enrollmentId,
+                serializeCommandData(),
+                null,
+                null,
+                LocalDateTime.now()
+        ));
     }
 
     @Override

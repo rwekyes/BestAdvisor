@@ -42,6 +42,9 @@ package edu.advising.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.advising.audit.AuditEvent;
+import edu.advising.audit.AuditLog;
+import edu.advising.audit.EventType;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
 import edu.advising.notifications.ObservableStudent;
@@ -158,6 +161,18 @@ public class UpdateContactCommand extends BaseCommand {
             errorMessage = "Database update failed: " + e.getMessage();
             System.err.println("✗ " + errorMessage);
         }
+
+        AuditLog.getInstance().log(new AuditEvent(
+                0,                          // id — 0 means "not persisted yet"
+                userId,
+                EventType.COMMAND_EXECUTED,
+                "USER",
+                this.student.getId(),
+                serializeOldValueCommandData(),
+                serializeNewValueCommandData(),
+                null,
+                LocalDateTime.now()
+        ));
     }
 
     // -------------------------------------------------------------------------
@@ -188,6 +203,18 @@ public class UpdateContactCommand extends BaseCommand {
             student.setPhone(newPhone);
             System.err.println("✗ Undo failed — could not restore contact info: " + e.getMessage());
         }
+
+        AuditLog.getInstance().log(new AuditEvent(
+                0,                          // id — 0 means "not persisted yet"
+                userId,
+                EventType.COMMAND_UNDONE,
+                "USER",
+                this.student.getId(),
+                serializeNewValueCommandData(),
+                serializeOldValueCommandData(),
+                null,
+                LocalDateTime.now()
+        ));
     }
 
     @Override
@@ -204,6 +231,33 @@ public class UpdateContactCommand extends BaseCommand {
     // -------------------------------------------------------------------------
     // Serialization — for CommandHistory persistence and session recovery
     // -------------------------------------------------------------------------
+
+    // Custom tricked out serializers with chrome spinnin' rims
+    private String serializeOldValueCommandData() {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> data = new HashMap<>();
+        data.put("studentPk", student.getId()); // Numeric PK, not the String student_id
+        data.put("oldEmail",  oldEmail);
+        data.put("oldPhone",  oldPhone);
+        try {
+            return mapper.writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("UpdateContactCommand: serialization failed", e);
+        }
+    }
+
+    private String serializeNewValueCommandData() {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> data = new HashMap<>();
+        data.put("studentPk", student.getId()); // Numeric PK, not the String student_id
+        data.put("newEmail",  newEmail);
+        data.put("newPhone",  newPhone);
+        try {
+            return mapper.writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("UpdateContactCommand: serialization failed", e);
+        }
+    }
 
     @Override
     protected String serializeCommandData() {

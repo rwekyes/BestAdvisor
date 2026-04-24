@@ -32,6 +32,9 @@ package edu.advising.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.advising.audit.AuditEvent;
+import edu.advising.audit.AuditLog;
+import edu.advising.audit.EventType;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
 import edu.advising.notifications.NotificationManager;
@@ -148,6 +151,17 @@ public class PaymentCommand extends BaseCommand {
             errorMessage = "Payment processing failed: " + e.getMessage();
             System.err.println("✗ " + errorMessage);
         }
+        AuditLog.getInstance().log(new AuditEvent(
+                0,                          // id — 0 means "not persisted yet"
+                userId,
+                EventType.COMMAND_EXECUTED,
+                "PAYMENT",
+                paymentRecord != null ? paymentRecord.getId() : 0,
+                null,
+                serializeCommandData(),
+                null,
+                LocalDateTime.now()
+        ));
     }
 
     // -------------------------------------------------------------------------
@@ -182,6 +196,18 @@ public class PaymentCommand extends BaseCommand {
         } catch (SQLException | IllegalAccessException e) {
             System.err.println("✗ Failed to process refund: " + e.getMessage());
         }
+
+        AuditLog.getInstance().log(new AuditEvent(
+                0,                          // id — 0 means "not persisted yet"
+                userId,
+                EventType.COMMAND_UNDONE,
+                "PAYMENT",
+                paymentRecord != null ? paymentRecord.getId() : 0, // if the payment fails, the id will be 0
+                serializeCommandData(),
+                null,
+                null,
+                LocalDateTime.now()
+        ));
     }
 
     @Override
