@@ -2,6 +2,9 @@ package edu.advising.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.advising.audit.AuditEvent;
+import edu.advising.audit.AuditLog;
+import edu.advising.audit.EventType;
 import edu.advising.contexts.EnrollmentContext;
 import edu.advising.contexts.WaitlistContext;
 import edu.advising.core.DatabaseManager;
@@ -78,6 +81,18 @@ public class DropCommand extends BaseCommand {
                     section.getCourseCode());
             System.out.println("✗ " + errorMessage);
         }
+
+        AuditLog.getInstance().log(new AuditEvent(
+                0,                          // id — 0 means "not persisted yet"
+                userId,
+                EventType.COMMAND_EXECUTED,
+                "ENROLLMENT",
+                this.previousEnrollmentId,
+                serializeCommandData(),
+                null,
+                null,
+                LocalDateTime.now()
+        ));
     }
 
     @Override
@@ -99,16 +114,17 @@ public class DropCommand extends BaseCommand {
             System.out.println("Undo failed");
         }
 
-        // Old Re-enroll code - responsibility changed to EnrollmentContext
-        /*
-        if (section.enroll(student) > 0) {
-            updateEnrollmentStatus("ENROLLED");
-            System.out.printf("↶ Undone: Drop of %s - student re-enrolled%n",
-                    section.getCourseCode());
-            this.undoneAt = LocalDateTime.now();
-            this.isUndone = true;
-        }
-        */
+        AuditLog.getInstance().log(new AuditEvent(
+                0,                          // id — 0 means "not persisted yet"
+                userId,
+                EventType.COMMAND_UNDONE,
+                "ENROLLMENT",
+                this.previousEnrollmentId,
+                null,
+                serializeCommandData(),
+                null,
+                LocalDateTime.now()
+        ));
 
     }
 
@@ -121,22 +137,6 @@ public class DropCommand extends BaseCommand {
     public String getDescription() {
         return String.format("Drop %s (%s)", section.getCourseCode(), section.getCourseName());
     }
-
-    // Below is commented out, can be removed as the enrollmentContext now handles this
-    /*
-    private void updateEnrollmentStatus(String status) {
-        // Section.drop() already updates the enrollment via ORM upsert.
-        // This method exists as a safety net for direct DropCommand use outside Section.
-        try {
-            String sql = "UPDATE enrollments SET status = ? " +
-                    "WHERE student_id = ? AND section_id = ? AND status = 'ENROLLED'";
-            dbManager.executeUpdate(sql, status, student.getId(), section.getId());
-        } catch (SQLException e) {
-            System.err.println("DropCommand: enrollment status sync failed — " + e.getMessage());
-        }
-    }
-
-     */
 
     private void promoteFromWaitlist() throws SQLException, IllegalAccessException {
         if (!section.getWaitlist().isEmpty() && section.hasCapacity()) {

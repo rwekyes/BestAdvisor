@@ -2,6 +2,9 @@ package edu.advising.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.advising.audit.AuditEvent;
+import edu.advising.audit.AuditLog;
+import edu.advising.audit.EventType;
 import edu.advising.contexts.WaitlistContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
@@ -74,6 +77,18 @@ public class WaitlistCommand extends BaseCommand {
                     section.getCourseCode());
             System.out.println("✗ " + errorMessage);
         }
+
+        AuditLog.getInstance().log(new AuditEvent(
+                0,                          // id — 0 means "not persisted yet"
+                userId,
+                EventType.COMMAND_EXECUTED,
+                "WAITLIST",
+                this.waitlistId,
+                null,
+                serializeCommandData(),
+                null,
+                LocalDateTime.now()
+        ));
     }
 
     @Override
@@ -90,6 +105,18 @@ public class WaitlistCommand extends BaseCommand {
             // Notify about waitlist removal.
             notificationManager.notifyWaitlistUpdate(student, section.getCourseCode(), Integer.MAX_VALUE);
         }
+
+        AuditLog.getInstance().log(new AuditEvent(
+                0,                          // id — 0 means "not persisted yet"
+                userId,
+                EventType.COMMAND_UNDONE,
+                "WAITLIST",
+                this.waitlistId,
+                serializeCommandData(),
+                null,
+                null,
+                LocalDateTime.now()
+        ));
     }
 
     @Override
