@@ -1,7 +1,7 @@
 package edu.advising.contexts;
 
-import edu.advising.commands.Enrollment;
-import edu.advising.commands.Section;
+import edu.advising.model.Enrollment;
+import edu.advising.model.Section;
 import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.states.EnrollmentState;

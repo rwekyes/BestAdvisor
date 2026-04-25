@@ -1,6 +1,6 @@
 package edu.advising.contexts;
 
-import edu.advising.commands.TranscriptRequest;
+import edu.advising.model.TranscriptRequest;
 import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.permissions.FeatureCodes;

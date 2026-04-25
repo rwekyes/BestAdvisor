@@ -1,13 +1,12 @@
 package edu.advising.contexts;
 
-import edu.advising.commands.RegistrationPeriod;
+import edu.advising.model.RegistrationPeriod;
 import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.states.RegistrationState;
 import edu.advising.states.StateFactory;
 
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 
 public class RegistrationPeriodContext {
 

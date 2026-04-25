@@ -6,6 +6,9 @@ import edu.advising.contexts.EnrollmentContext;
 import edu.advising.contexts.WaitlistContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
+import edu.advising.model.Enrollment;
+import edu.advising.model.Section;
+import edu.advising.model.WaitlistEntry;
 import edu.advising.notifications.ObservableStudent;
 import edu.advising.users.Student;
 

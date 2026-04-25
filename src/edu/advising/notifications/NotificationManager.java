@@ -1,6 +1,5 @@
 package edu.advising.notifications;
 
-import edu.advising.commands.TranscriptRequest;
 import edu.advising.core.DatabaseManager;
 import edu.advising.users.Faculty;
 import edu.advising.users.Student;

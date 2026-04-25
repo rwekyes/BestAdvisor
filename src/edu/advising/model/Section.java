@@ -1,14 +1,17 @@
-package edu.advising.commands;
+package edu.advising.model;
 
 import edu.advising.core.*;
 import edu.advising.users.Faculty;
 import edu.advising.users.Student;
 
 import java.sql.SQLException;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Course Section - Represents a course section
@@ -38,6 +41,8 @@ public class Section {
     private int facultyId; // References faculty
     @Column(name = "room")
     private String room;
+    @Column(name = "delivery_method")
+    private String deliveryMethod;
     @Column(name = "status")
     private String status;  //OPEN, CLOSED, CANCELLED
     @ManyToOne(targetEntity = Course.class, joinColumn = "course_id")
@@ -55,6 +60,8 @@ public class Section {
     private List<Enrollment> enrollments;
     @OneToMany(targetEntity = WaitlistEntry.class, mappedBy = "section_id")
     private List<WaitlistEntry> waitlist;
+    @OneToMany(targetEntity = SectionMeetingTime.class, mappedBy = "section_id")
+    private List<SectionMeetingTime> meetingTimes;
 
     public Section() {}
 
@@ -365,5 +372,42 @@ public class Section {
     public void setFaculty(Faculty faculty) {
         this.facultyId = faculty.getId();
         this.faculty = faculty;
+    }
+
+    public List<SectionMeetingTime> getMeetingTimes() throws SQLException {
+        if (this.meetingTimes == null) {
+            this.meetingTimes = DatabaseManager.getInstance()
+                    .fetchMany(SectionMeetingTime.class, "section_id", this.id);
+        }
+        return meetingTimes;
+    }
+
+    public List<DayOfWeek> getMeetingDays() throws SQLException{
+        return getMeetingTimes().stream()
+                .map(SectionMeetingTime::getDayOfWeek)
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public List<LocalTime> getStartTimes() throws SQLException{
+        return getMeetingTimes().stream()
+                .map(SectionMeetingTime::getStartTime)
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public List<LocalTime> getEndTimes() throws SQLException{
+        return getMeetingTimes().stream()
+                .map(SectionMeetingTime::getEndTime)
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public String getDeliveryMethod() {
+        return deliveryMethod;
+    }
+
+    public void setDeliveryMethod(String deliveryMethod) {
+        this.deliveryMethod = deliveryMethod;
     }
 }

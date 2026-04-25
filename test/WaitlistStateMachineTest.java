@@ -1,10 +1,11 @@
 import edu.advising.commands.*;
 import edu.advising.contexts.WaitlistContext;
 import edu.advising.core.DatabaseManager;
+import edu.advising.model.Section;
+import edu.advising.model.WaitlistEntry;
 import edu.advising.notifications.ObservableStudent;
 import edu.advising.states.waitliststates.*;
 import edu.advising.users.Student;
-import edu.advising.users.UserFactory;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package edu.advising.commands;
+package edu.advising.model;
 
 import edu.advising.core.*;
 

@@ -612,6 +612,8 @@ public class DatabaseManager {
                                 field.set(dto, ((Timestamp) value).toLocalDateTime());  // This assumes LocalDateTime
                             } else if (value instanceof Date) {
                                 field.set(dto, ((Date) value).toLocalDate());  // This assumes LocalDate
+                            } else if (value instanceof Time) {
+                                field.set(dto, ((Time) value).toLocalTime());
                             } else {
                                 field.set(dto, value);
                             }
@@ -1004,6 +1006,7 @@ public class DatabaseManager {
                     "enrolled INT DEFAULT 0, " +
                     "faculty_id INT, " +
                     "room VARCHAR(50), " +
+                    "delivery_method VARCHAR(50), " +
                     "status VARCHAR(20) DEFAULT 'OPEN', " +  // OPEN, CLOSED, CANCELLED
                     "FOREIGN KEY (course_id) REFERENCES courses(id), " +
                     "FOREIGN KEY (faculty_id) REFERENCES faculty(id), " +

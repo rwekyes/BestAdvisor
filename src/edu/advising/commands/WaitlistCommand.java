@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.advising.contexts.WaitlistContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
+import edu.advising.model.Section;
+import edu.advising.model.WaitlistEntry;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.notifications.ObservableStudent;
 import edu.advising.users.Student;

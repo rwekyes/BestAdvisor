@@ -1,4 +1,4 @@
-package edu.advising.commands;
+package edu.advising.model;
 
 // ============================================================================
 // WEEK 5: COMMAND PATTERN - Payment Model (ORM Entity)

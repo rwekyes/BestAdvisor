@@ -1,5 +1,5 @@
 import edu.advising.commands.RegisterCommand;
-import edu.advising.commands.Section;
+import edu.advising.model.Section;
 import edu.advising.contexts.RegistrationPeriodContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.ObservableStudent;

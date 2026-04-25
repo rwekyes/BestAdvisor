@@ -1,15 +1,18 @@
 package edu.advising.catalog;
 
-import edu.advising.commands.Course;
-import edu.advising.commands.Section;
+import edu.advising.model.Course;
 
 import java.util.List;
 
 public class CourseNode implements CatalogNode{
 
     private Course course;
-
     private List<CatalogNode> sections;
+
+    public CourseNode(Course course, List<CatalogNode> sections){
+        this.course = course;
+        this.sections = sections;
+    }
 
     @Override
     public String getDisplayName() {
@@ -18,12 +21,12 @@ public class CourseNode implements CatalogNode{
 
     @Override
     public double getTotalCredits() {
-        return 0;
+        return course.getCredits() * sections.size();
     }
 
     @Override
     public int getTotalSections() {
-        return 0;
+        return sections.size();
     }
 
     @Override

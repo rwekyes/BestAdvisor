@@ -1,6 +1,8 @@
 package edu.advising.catalog;
 
-import edu.advising.commands.Section;
+import edu.advising.format.MeetingDaysAbbreviatedFormatter;
+import edu.advising.format.MeetingTimesHmmaFormatter;
+import edu.advising.model.Section;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -8,6 +10,10 @@ import java.util.List;
 public class SectionNode implements CatalogNode{
 
     private Section section;
+
+    public SectionNode(Section section){
+        this.section = section;
+    }
 
     @Override
     public String getDisplayName() {
@@ -34,6 +40,7 @@ public class SectionNode implements CatalogNode{
         return true;
     }
 
+
     public Section getSection() {
         return section;
     }
@@ -42,16 +49,16 @@ public class SectionNode implements CatalogNode{
         return section.getFaculty().getFullName();
     }
 
-    public String getMeetingDays(){
-        return section.getSemester(); //TODO: Set up a field in the db and Section object for the meeting days
+    public String getMeetingDays() throws SQLException {
+        return MeetingDaysAbbreviatedFormatter.instance.format(section.getMeetingDays());
     }
 
-    public String getStartTime(){
-        return section.getSemester(); //TODO: Set up a field in the db and Section object
+    public String getStartTime() throws SQLException {
+        return MeetingTimesHmmaFormatter.instance.format(section.getStartTimes());
     }
 
-    public String getEndTime(){
-        return section.getSemester(); //TODO: Same as above
+    public String getEndTime() throws SQLException {
+        return MeetingTimesHmmaFormatter.instance.format(section.getEndTimes());
     }
 
     public String getRoom(){
@@ -63,6 +70,6 @@ public class SectionNode implements CatalogNode{
     }
 
     public String getDeliveryMode(){
-        return ""; //TODO: Figure out what the delivery mode even means, Claude suggested the field in the design
+        return section.getDeliveryMethod();
     }
 }

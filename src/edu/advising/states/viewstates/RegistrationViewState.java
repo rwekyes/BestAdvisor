@@ -1,9 +1,8 @@
 package edu.advising.states.viewstates;
 
 import edu.advising.commands.RegisterCommand;
-import edu.advising.commands.RegistrationPeriod;
-import edu.advising.commands.Section;
-import edu.advising.contexts.RegistrationPeriodContext;
+import edu.advising.model.RegistrationPeriod;
+import edu.advising.model.Section;
 import edu.advising.contexts.ViewContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.ObservableStudent;

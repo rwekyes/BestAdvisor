@@ -1,13 +1,16 @@
 package edu.advising.catalog;
 
-import edu.advising.commands.Department;
-
 import java.util.List;
 
 public class CollegeNode implements CatalogNode{
 
     private String name;
     private List<CatalogNode> departments;
+
+    public CollegeNode(String name, List<CatalogNode> departments){
+        this.name = name;
+        this.departments = departments;
+    }
 
     @Override
     public String getDisplayName() {
@@ -16,12 +19,16 @@ public class CollegeNode implements CatalogNode{
 
     @Override
     public double getTotalCredits() {
-        return 0;
+        return departments.stream()
+                .mapToDouble(d -> d.getTotalCredits())
+                .sum();
     }
 
     @Override
     public int getTotalSections() {
-        return 0;
+        return departments.stream()
+                .mapToInt(d -> d.getTotalSections())
+                .sum();
     }
 
     @Override

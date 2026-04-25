@@ -1,6 +1,6 @@
 package edu.advising.users;
 
-import edu.advising.commands.Section;
+import edu.advising.model.Section;
 import edu.advising.core.*;
 
 import java.sql.SQLException;

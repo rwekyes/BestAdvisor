@@ -1,8 +1,8 @@
 package edu.advising.contexts;
 
 import edu.advising.commands.CommandExecutor;
-import edu.advising.commands.Section;
-import edu.advising.commands.WaitlistEntry;
+import edu.advising.model.Section;
+import edu.advising.model.WaitlistEntry;
 import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.notifications.ObservableStudent;

@@ -1,4 +1,4 @@
-package edu.advising.commands;
+package edu.advising.model;
 
 /*
 Faculty Permission - Represents a request to a faculty member to approve a waitlisted student
@@ -7,7 +7,6 @@ Faculty Permission - Represents a request to a faculty member to approve a waitl
 import edu.advising.core.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Table(name = "faculty_permissions")
 public class FacultyPermission {
