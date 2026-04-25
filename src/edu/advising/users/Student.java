@@ -1,7 +1,7 @@
 package edu.advising.users;
 
-import edu.advising.commands.Section;
-import edu.advising.commands.WaitlistEntry;
+import edu.advising.model.Section;
+import edu.advising.model.WaitlistEntry;
 import edu.advising.core.*;
 
 import java.math.BigDecimal;

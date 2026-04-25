@@ -9,6 +9,8 @@ import edu.advising.contexts.FacultyPermissionContext;
 import edu.advising.contexts.RegistrationPeriodContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
+import edu.advising.model.FacultyPermission;
+import edu.advising.model.Section;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.notifications.ObservableStudent;
 
@@ -18,7 +20,6 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.advising.permissions.FeatureCodes;
 import edu.advising.permissions.PermissionTree;
-import edu.advising.permissions.PermissionTreeFactory;
 import edu.advising.users.Student;
 
 import java.util.HashMap;

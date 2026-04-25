@@ -1,10 +1,9 @@
-import edu.advising.commands.TranscriptRequest;
+import edu.advising.model.TranscriptRequest;
 import edu.advising.contexts.TranscriptRequestContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.states.StateFactory;
 import edu.advising.states.transcriptrequeststates.*;
 import edu.advising.users.Student;
-import edu.advising.users.UserFactory;
 
 import java.sql.SQLException;
 

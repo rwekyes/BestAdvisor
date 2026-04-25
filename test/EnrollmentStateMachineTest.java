@@ -1,6 +1,6 @@
 
-import edu.advising.commands.Enrollment;
-import edu.advising.commands.Section;
+import edu.advising.model.Enrollment;
+import edu.advising.model.Section;
 import edu.advising.contexts.EnrollmentContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.states.enrollmentstates.CompletedEnrollmentState;

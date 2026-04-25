@@ -1,7 +1,7 @@
 package edu.advising.states.enrollmentstates;
 
 import edu.advising.commands.CommandExecutor;
-import edu.advising.commands.WaitlistEntry;
+import edu.advising.model.WaitlistEntry;
 import edu.advising.contexts.EnrollmentContext;
 import edu.advising.contexts.WaitlistContext;
 import edu.advising.core.DatabaseManager;

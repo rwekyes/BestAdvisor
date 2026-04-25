@@ -40,10 +40,8 @@ package edu.advising.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.advising.core.Column;
 import edu.advising.core.DatabaseManager;
-import edu.advising.core.Id;
-import edu.advising.core.Table;
+import edu.advising.model.Section;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.notifications.ObservableStudent;
 import edu.advising.users.Faculty;

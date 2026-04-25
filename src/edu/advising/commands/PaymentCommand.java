@@ -37,6 +37,7 @@ import edu.advising.audit.AuditLog;
 import edu.advising.audit.EventType;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
+import edu.advising.model.Payment;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.notifications.ObservableStudent;
 import edu.advising.users.Student;

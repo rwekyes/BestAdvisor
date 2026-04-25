@@ -1,6 +1,6 @@
 package edu.advising.states.registrationstates;
 
-import edu.advising.commands.RegistrationPeriod;
+import edu.advising.model.RegistrationPeriod;
 import edu.advising.contexts.RegistrationPeriodContext;
 import edu.advising.states.RegistrationState;
 

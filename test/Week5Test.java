@@ -1,5 +1,5 @@
 import edu.advising.core.DatabaseManager;
-import edu.advising.notifications.*;
+import edu.advising.model.Section;
 import edu.advising.permissions.PermissionTreeFactory;
 import edu.advising.users.Student;
 import edu.advising.users.UserFactory;
@@ -30,12 +30,9 @@ import edu.advising.commands.CommandRecord;
 // ============================================================================
 
 import edu.advising.commands.*;
-import edu.advising.core.DatabaseManager;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.notifications.ObservableStudent;
 import edu.advising.users.Faculty;
-import edu.advising.users.Student;
-import edu.advising.users.UserFactory;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -55,7 +52,7 @@ public class Week5Test {
     private static ObservableStudent    student;      // primary test student
     private static ObservableStudent    student2;     // second student for multi-student tests
     private static Faculty              faculty;
-    private static Section              section;      // capacity=3, starts empty
+    private static Section section;      // capacity=3, starts empty
     private static Section              fullSection;  // capacity=1, pre-filled
     private static CommandExecutor      executor;     // one executor per student session
 

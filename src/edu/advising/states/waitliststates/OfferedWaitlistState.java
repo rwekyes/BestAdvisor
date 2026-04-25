@@ -2,9 +2,8 @@ package edu.advising.states.waitliststates;
 
 import edu.advising.commands.CommandExecutor;
 import edu.advising.commands.RegisterCommand;
-import edu.advising.commands.Section;
-import edu.advising.commands.WaitlistEntry;
-import edu.advising.contexts.EnrollmentContext;
+import edu.advising.model.Section;
+import edu.advising.model.WaitlistEntry;
 import edu.advising.contexts.WaitlistContext;
 import edu.advising.notifications.ObservableStudent;
 import edu.advising.permissions.PermissionTreeFactory;

@@ -1,4 +1,4 @@
-package edu.advising.permissions;
+package edu.advising.model;
 
 import edu.advising.core.Column;
 import edu.advising.core.Id;

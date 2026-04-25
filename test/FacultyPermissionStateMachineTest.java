@@ -1,6 +1,9 @@
 import edu.advising.commands.*;
 import edu.advising.contexts.FacultyPermissionContext;
 import edu.advising.core.DatabaseManager;
+import edu.advising.model.FacultyPermission;
+import edu.advising.model.Section;
+import edu.advising.model.WaitlistEntry;
 import edu.advising.notifications.ObservableStudent;
 import edu.advising.permissions.PermissionTreeFactory;
 import edu.advising.states.StateFactory;
