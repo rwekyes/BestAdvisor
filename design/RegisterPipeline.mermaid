@@ -1,0 +1,77 @@
+classDiagram
+    namespace common {
+        class PipelineHandler~T~ {
+            <<interface>>
+            +handle(T context) PipelineResult
+        }
+
+        class PipelineResult {
+            -boolean passed
+            -String failedAt
+            -String errorMessage
+            -Section conflictingSection
+            +passed() PipelineResult$
+            +failed(String failedAt, String message) PipelineResult$
+            +failedWithConflict(String failedAt, Section conflict) PipelineResult$
+            +isPassed() boolean
+            +getFailedAt() String
+            +getErrorMessage() String
+            +getConflictingSection() Section
+        }
+    }
+
+    namespace commands {
+        class RegistrationContext {
+            -ObservableStudent student
+            -Section section
+            -PermissionTree permissionTree
+            +getStudent() ObservableStudent
+            +getSection() Section
+            +getPermissionTree() PermissionTree
+        }
+
+        class RegistrationPipeline {
+            -List~PipelineHandler~RegistrationContext~~ handlers
+            +run(RegistrationContext ctx) PipelineResult
+        }
+
+        class PermissionCheckHandler {
+            +handle(RegistrationContext ctx) PipelineResult
+        }
+
+        class RegistrationPeriodHandler {
+            +handle(RegistrationContext ctx) PipelineResult
+        }
+
+        class CapacityCheckHandler {
+            +handle(RegistrationContext ctx) PipelineResult
+        }
+
+        class ScheduleConflictHandler {
+            +handle(RegistrationContext ctx) PipelineResult
+        }
+
+        class EnrollmentHandler {
+            +handle(RegistrationContext ctx) PipelineResult
+        }
+
+        class RegisterCommand {
+            -ObservableStudent student
+            -Section section
+            -PermissionTree permissionTree
+            -RegistrationPipeline pipeline
+            +execute()
+            +undo()
+        }
+    }
+
+    PipelineHandler~T~ <|.. PermissionCheckHandler
+    PipelineHandler~T~ <|.. RegistrationPeriodHandler
+    PipelineHandler~T~ <|.. CapacityCheckHandler
+    PipelineHandler~T~ <|.. ScheduleConflictHandler
+    PipelineHandler~T~ <|.. EnrollmentHandler
+
+    RegistrationPipeline o-- PipelineHandler~T~
+    RegisterCommand --> RegistrationPipeline
+    RegisterCommand ..> RegistrationContext : creates
+    RegistrationPipeline ..> PipelineResult : returns
