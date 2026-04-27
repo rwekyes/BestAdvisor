@@ -4,12 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.advising.audit.AuditEvent;
 import edu.advising.audit.AuditLog;
 import edu.advising.audit.EventType;
-import edu.advising.contexts.EnrollmentContext;
-import edu.advising.contexts.FacultyPermissionContext;
-import edu.advising.contexts.RegistrationPeriodContext;
+import edu.advising.common.PipelineResult;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
-import edu.advising.model.FacultyPermission;
 import edu.advising.model.Section;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.notifications.ObservableStudent;
@@ -18,7 +15,6 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.advising.permissions.FeatureCodes;
 import edu.advising.permissions.PermissionTree;
 import edu.advising.users.Student;
 
@@ -53,75 +49,16 @@ public class RegisterCommand extends BaseCommand {
     @Override
     public void execute() {
         executionTime = LocalDateTime.now();
+        RegistrationContext ctx = new RegistrationContext(student, section, permissionTree);
 
-        // First check for holds from the permission tree
-        if (!permissionTree.hasPermission(FeatureCodes.REGISTER_COURSES)) {
-            successful = false;
-            errorMessage = permissionTree.explainDenial(FeatureCodes.REGISTER_COURSES);
-            return;
-        }
+        PipelineResult result = RegistrationPipeline.standard().run(ctx);
 
-        // Check if registration is closed before continuing
-        try {
-            RegistrationPeriodContext periodCtx = RegistrationPeriodContext.currentPeriod(
-                    section.getSemester(), section.getYear());
-            if (periodCtx == null || !periodCtx.canRegister()) {
-                successful = false;
-                errorMessage = "Registration is not currently open for " + section.getCourseCode();
-                System.out.println("✗ " + errorMessage);
-                return;
-            }
-        } catch (SQLException e) {
-            // If we can't check the period, fail safe — block registration
-            successful = false;
-            errorMessage = "Could not verify registration period status";
-            System.out.println("✗ " + errorMessage);
-            return;
-        }
+        successful = result.isPassed();
+        executed = result.isPassed();
+        errorMessage = result.isPassed() ? null : result.getErrorMessage();
 
-        if (!section.hasCapacity()) {
-            // Check if student has a valid faculty permission to bypass capacity
-            try {
-                FacultyPermission fp = fetchPermissionForStudent(student, section);
-                FacultyPermissionContext permCtx = fp != null
-                        ? FacultyPermissionContext.load(fp, null, section, null)
-                        : null;
-                if (permCtx == null || !permCtx.isValid()) {
-                    successful = false;
-                    errorMessage = String.format("Registration failed for %s - section full",
-                            section.getCourseCode());
-                    System.out.println("✗ " + errorMessage);
-                    return;
-                }
-                // Valid permission — bypass capacity check and continue
-            } catch (SQLException e) {
-                successful = false;
-                errorMessage = "Could not verify faculty permission";
-                return;
-            }
-        }
-
-        if (hasScheduleConflict()) {
-            successful = false;
-            errorMessage = String.format("Registration failed for %s - schedule conflict", section.getCourseCode());
-            System.out.println("✗ " + errorMessage);
-            return;
-        }
-
-        try {
-            EnrollmentContext enrollmentContext = EnrollmentContext.create(student, section);
-            this.enrollmentId = enrollmentContext.getEnrollment().getId();
-            enrollmentContext.confirm(); // PENDING → ENROLLED, persists, notifies
-            executed   = true;
-            successful = true;
-            System.out.printf("✓ Student %s registered for %s%n",
-                    student.getStudentId(), section.getCourseCode());
-            // Line below is commented out to meet acceptance criteria for Enrollment State machine,
-            // notification should happen in enrollmentContext.confirm()
-            // notificationManager.notifyRegistration(student, section.getCourseCode(), true);
-        } catch (SQLException | IllegalAccessException e) {
-            successful   = false;
-            errorMessage = "Already enrolled or duplicate registration prevented.";
+        if (result.isPassed()) {
+            this.enrollmentId = ctx.getEnrollment().getId();
         }
 
         AuditLog.getInstance().log(new AuditEvent(
@@ -177,11 +114,6 @@ public class RegisterCommand extends BaseCommand {
         return String.format("Register for %s (%s)", section.getCourseCode(), section.getCourseName());
     }
 
-    private boolean hasScheduleConflict() {
-        // Simplified - in real implementation, check time conflicts in student.
-        return false;
-    }
-
     @Override
     protected String serializeCommandData() {
         ObjectMapper mapper = new ObjectMapper();
@@ -217,25 +149,6 @@ public class RegisterCommand extends BaseCommand {
         } catch (JsonProcessingException | SQLException e) {
             throw new RuntimeException("Failed to deserialize RegisterCommand data", e);
         }
-    }
-
-    private FacultyPermission fetchPermissionForStudent(Student student, Section section) throws SQLException {
-        String sql = "SELECT fp.* FROM faculty_permissions fp " +
-                "JOIN waitlist w ON fp.waitlist_id = w.id " +
-                "WHERE w.student_id = ? AND fp.section_id = ? AND fp.status = 'APPROVED'";
-        return DatabaseManager.getInstance().fetch(sql, rs -> {
-            FacultyPermission fp = new FacultyPermission();
-            fp.setId(rs.getInt("id"));
-            fp.setSectionId(rs.getInt("section_id"));
-            fp.setWaitlistId(rs.getInt("waitlist_id"));
-            var requestTs = rs.getTimestamp("request_date");
-            fp.setRequestDate(requestTs != null ? requestTs.toLocalDateTime() : null);
-            var expiryTs = rs.getTimestamp("expiry_date");
-            fp.setExpiryDate(expiryTs != null ? expiryTs.toLocalDateTime() : null);
-            fp.setDenyReason(rs.getString("deny_reason"));
-            fp.setStatus(rs.getString("status"));
-            return fp;
-        }, student.getId(), section.getId());
     }
 }
 

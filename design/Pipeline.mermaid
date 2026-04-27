@@ -1,0 +1,35 @@
+flowchart TD
+    subgraph Pipeline["RegistrationPipeline (orchestrator)"]
+        direction TB
+        P1[PermissionCheckHandler]
+        P2[RegistrationPeriodHandler]
+        P3[CapacityCheckHandler]
+        P4[ScheduleConflictHandler]
+        P5[EnrollmentHandler]
+
+        P1 -->|pass| P2
+        P2 -->|pass| P3
+        P3 -->|pass| P4
+        P4 -->|pass| P5
+    end
+
+    RC[RegisterCommand] -->|new PipelineContext\nstudent + section| Pipeline
+
+    P1 -->|fail: no permission| PR1[PipelineResult\nfailed at: PermissionCheck\nerror message]
+    P2 -->|fail: reg. closed| PR2[PipelineResult\nfailed at: PeriodCheck\nerror message]
+    P3 -->|fail: section full| PR3[PipelineResult\nfailed at: CapacityCheck\nerror message]
+    P4 -->|fail: time overlap| PR4[PipelineResult\nfailed at: ConflictCheck\nconflicting section name\nconflicting days + times]
+    P5 -->|success| PR5[PipelineResult\npassed \nnew Enrollment created]
+
+PR1 & PR2 & PR3 & PR4 -->|enrollment aborted| RC
+PR5 -->|enrollment persisted| RC
+
+subgraph ConflictCheck["ScheduleConflictHandler detail"]
+direction LR
+SC1[get student's\ncurrent enrollments] --> SC2[for each Enrollment\nget SectionMeetingTimes]
+SC2 --> SC3{any day + time\noverlap with\nnew section?}
+SC3 -->|yes| SC4[return conflicting\nSection object]
+SC3 -->|no| SC5[pass to next handler]
+end
+
+P4 -.->|zoom in| ConflictCheck
