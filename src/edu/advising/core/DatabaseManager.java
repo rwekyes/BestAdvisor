@@ -822,6 +822,7 @@ public class DatabaseManager {
                     "id INT PRIMARY KEY, " +
                     "student_id VARCHAR(20) UNIQUE NOT NULL, " +
                     "gpa DECIMAL(3,2) DEFAULT 0.00, " +
+                    "credits_earned INT DEFAULT 0, " +
                     "enrollment_status VARCHAR(20) DEFAULT 'ACTIVE', " +
                     "academic_standing VARCHAR(20) DEFAULT 'GOOD_STANDING', " +
                     "classification VARCHAR(20), " +  // FRESHMAN, SOPHOMORE, etc.

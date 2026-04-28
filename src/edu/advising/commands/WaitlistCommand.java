@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.advising.audit.AuditEvent;
 import edu.advising.audit.AuditLog;
 import edu.advising.audit.EventType;
+import edu.advising.common.PipelineResult;
 import edu.advising.contexts.WaitlistContext;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
@@ -12,6 +13,7 @@ import edu.advising.model.Section;
 import edu.advising.model.WaitlistEntry;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.notifications.ObservableStudent;
+import edu.advising.permissions.PermissionTree;
 import edu.advising.users.Student;
 
 import java.sql.SQLException;
@@ -26,19 +28,21 @@ import java.util.Map;
 public class WaitlistCommand extends BaseCommand {
     private ObservableStudent student;
     private Section section;
+    private PermissionTree permissionTree;
     private int waitlistId;
     private NotificationManager notificationManager;
 
     // Adding No argument constructor needed for fromSuperType() and ORM autoMapper()
     public WaitlistCommand() {
-        this(null, null);
+        this(null, null, null);
     }
 
-    public WaitlistCommand(ObservableStudent student, Section section) {
+    public WaitlistCommand(ObservableStudent student, Section section, PermissionTree permissionTree) {
         super();
         this.commandType         = "WAITLIST";
         this.student             = student;
         this.section             = section;
+        this.permissionTree = permissionTree;
         this.notificationManager = NotificationManager.getInstance();
     }
 
@@ -52,18 +56,25 @@ public class WaitlistCommand extends BaseCommand {
     @Override
     public void execute() {
         executionTime = LocalDateTime.now();
+        RegistrationContext ctx = new RegistrationContext(student, section, permissionTree);
 
-        if ((this.waitlistId = section.addToWaitlist(student)) > 0) {
+        PipelineResult result = WaitlistPipeline.standard().run(ctx);
 
-            WaitlistEntry entry = fetchWaitlistEntry(waitlistId); // raw fetch by id
-            WaitlistContext ctx = WaitlistContext.fromEntry(entry, section, student,
-                    new CommandExecutor(student.getId()));
-            // Entry is already ACTIVE from default — persist to confirm status
-            ctx.persist();
-
-            executed = true;
+        if (!result.isPassed()) {
+            successful   = false;
+            errorMessage = result.getErrorMessage();
+            System.out.println("✗ " + errorMessage);
+        } else {
+            executed   = true;
             successful = true;
+
             try {
+                // addToWaitlist() updated the section's cache, so the entry is already there
+                section.getWaitlist().stream()
+                        .filter(we -> we.getStudentId() == student.getId())
+                        .findFirst()
+                        .ifPresent(we -> this.waitlistId = we.getId());
+
                 int position = section.getWaitlistPosition(student);
                 System.out.printf("✓ Student %s added to waitlist for %s (Position: #%d)%n",
                         student.getStudentId(), section.getCourseCode(), position);
@@ -73,13 +84,7 @@ public class WaitlistCommand extends BaseCommand {
                         student.getStudentId(), section.getCourseCode());
                 notificationManager.notifyWaitlistUpdate(student, section.getCourseCode(), -1);
             }
-        } else {
-            successful   = false;
-            errorMessage = String.format("Waitlist add failed for %s — already on waitlist or other error",
-                    section.getCourseCode());
-            System.out.println("✗ " + errorMessage);
         }
-
         AuditLog.getInstance().log(new AuditEvent(
                 0,                          // id — 0 means "not persisted yet"
                 userId,

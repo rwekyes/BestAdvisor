@@ -14,22 +14,25 @@ public class CreditsEarnedRosterIterator implements RosterIterator{
 
     public CreditsEarnedRosterIterator(List<Student> students){
         sorted = new ArrayList<Student>(students);
-        sorted.sort(Comparator.comparing(Student::getGpa)); //TODO: Set up a credits field in both the db and Student object
+        sorted.sort(Comparator.comparing(Student::getCreditsEarned));
         cursor = 0;
     }
 
     @Override
     public boolean hasNext() {
-        return false;
+        return cursor < sorted.size();
     }
 
     @Override
     public Student next() {
-        return null;
+        if (!hasNext()) {
+            System.err.println("Student Roster has no more elements");
+        }
+        return sorted.get(cursor++);
     }
 
     @Override
     public void reset() {
-
+        cursor = 0;
     }
 }

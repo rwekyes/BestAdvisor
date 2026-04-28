@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.advising.audit.AuditEvent;
 import edu.advising.audit.AuditLog;
 import edu.advising.audit.EventType;
+import edu.advising.common.PipelineResult;
 import edu.advising.contexts.EnrollmentContext;
 import edu.advising.contexts.WaitlistContext;
 import edu.advising.core.DatabaseManager;
@@ -13,6 +14,7 @@ import edu.advising.model.Enrollment;
 import edu.advising.model.Section;
 import edu.advising.model.WaitlistEntry;
 import edu.advising.notifications.ObservableStudent;
+import edu.advising.permissions.PermissionTree;
 import edu.advising.users.Student;
 
 import java.sql.SQLException;
@@ -27,19 +29,23 @@ import java.util.Map;
 public class DropCommand extends BaseCommand {
     private ObservableStudent student;
     private Section section;
+    private PermissionTree permissionTree;
+    private String dropReason;
     private int previousEnrollmentId;
     private DatabaseManager dbManager;
 
     // Adding No argument constructor needed for fromSuperType() and ORM autoMapper()
     public DropCommand() {
-        this(null, null);
+        this(null, null, null, null);
     }
 
-    public DropCommand(ObservableStudent student, Section section) {
+    public DropCommand(ObservableStudent student, Section section, PermissionTree permissionTree, String dropReason) {
         super();
         this.commandType = "DROP";
         this.student = student;
         this.section = section;
+        this.permissionTree = permissionTree;
+        this.dropReason = dropReason;
         this.dbManager = DatabaseManager.getInstance();
     }
 
@@ -53,37 +59,22 @@ public class DropCommand extends BaseCommand {
     @Override
     public void execute() {
         executionTime = LocalDateTime.now();
-        try {
-            Enrollment enrollment = getEnrollment();
-            if (enrollment == null) {
-                successful   = false;
-                errorMessage = String.format("Drop failed — student not enrolled in %s",
-                        section.getCourseCode());
-                System.out.println("✗ " + errorMessage);
-                return;
-            }
-            this.previousEnrollmentId = enrollment.getId();
-            EnrollmentContext enrollmentContext = EnrollmentContext.load(enrollment, student, section);
-            // TODO: Figure out where the heck the dropReason String comes from
-            enrollmentContext.drop("dropReason"); // ENROLLED → DROPPED, persists, notifies
 
-            executed   = true;
-            successful = true;
-            System.out.printf("✓ Student %s dropped %s%n",
-                    student.getStudentId(), section.getCourseCode());
-
-            try {
-                promoteFromWaitlist();
-            } catch (SQLException | IllegalAccessException e) {
-                e.printStackTrace();
-                System.out.println("Failed to promote from waitlist.");
-            }
+        Enrollment enrollment = null;
+        try{
+            enrollment = getEnrollment();
         } catch (SQLException e) {
             successful   = false;
-            errorMessage = String.format("Drop failed — student not enrolled in %s",
-                    section.getCourseCode());
-            System.out.println("✗ " + errorMessage);
+            errorMessage = String.format("Drop failed — enrollment not loaded - " + e.getMessage());
         }
+
+        DropContext ctx = new DropContext(student, section, permissionTree, enrollment, dropReason);
+
+        PipelineResult result = DropPipeline.standard().run(ctx);
+
+        successful = result.isPassed();
+        executed = result.isPassed();
+        errorMessage = result.isPassed() ? null : result.getErrorMessage();
 
         AuditLog.getInstance().log(new AuditEvent(
                 0,                          // id — 0 means "not persisted yet"
