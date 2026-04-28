@@ -20,6 +20,8 @@ public class Student extends User {
     protected String studentId;
     @Column(name = "gpa")
     protected BigDecimal gpa;
+    @Column(name = "credits_earned")
+    protected int creditsEarned;
     @Column(name = "enrollment_status")
     protected String enrollmentStatus;
     @Column(name = "academic_standing")
@@ -132,6 +134,18 @@ public class Student extends User {
 
     public void setAdvisorId(int advisorId) {
         this.advisorId = advisorId;
+    }
+
+    public int getCreditsEarned(){
+        return creditsEarned;
+    }
+
+    public void setCreditsEarned(int newValue){
+        this.creditsEarned = newValue;
+    }
+
+    public void addCredits(int add){
+        this.creditsEarned += add;
     }
 
     public List<Section> getSections() throws SQLException {

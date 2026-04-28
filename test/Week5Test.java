@@ -263,7 +263,7 @@ public class Week5Test {
         // Student is enrolled from group 1 redo above
         check("2.pre enrolled count = 1",                    section.getEnrolled() == 1);
 
-        DropCommand drop = new DropCommand(student, section);
+        DropCommand drop = new DropCommand(student, section, null, null );
         executor.execute(drop);
         check("2.1  drop execute() wasSuccessful()",         drop.wasSuccessful());
         check("2.2  section.enrolled = 0",                   section.getEnrolled() == 0);
@@ -274,11 +274,11 @@ public class Week5Test {
         check("2.4  undo drop — enrolled = 1",               section.getEnrolled() == 1);
 
         // Drop again to leave clean state for later groups
-        executor.execute(new DropCommand(student, section));
+        executor.execute(new DropCommand(student, section, null, null ));
         check("2.5  re-drop for cleanup — enrolled = 0",     section.getEnrolled() == 0);
 
         // Drop student who is NOT enrolled — should fail gracefully
-        DropCommand badDrop = new DropCommand(student2, section);
+        DropCommand badDrop = new DropCommand(student2, section, null, null );
         executor.execute(badDrop);
         check("2.6  drop non-enrolled student wasSuccessful() = false", !badDrop.wasSuccessful());
         check("2.7  enrolled count unchanged at 0",          section.getEnrolled() == 0);
@@ -303,7 +303,7 @@ public class Week5Test {
         header("GROUP 3 — WaitlistCommand");
 
         // fullSection capacity=1 is pre-filled, so student lands on waitlist
-        WaitlistCommand wl = new WaitlistCommand(student, fullSection);
+        WaitlistCommand wl = new WaitlistCommand(student, fullSection, null);
         executor.execute(wl);
         check("3.1  waitlist execute() wasSuccessful()",     wl.wasSuccessful());
         check("3.2  canUndo() after waitlist",               executor.canUndo());
@@ -316,13 +316,13 @@ public class Week5Test {
         }
 
         // Duplicate entry must fail
-        WaitlistCommand dup = new WaitlistCommand(student, fullSection);
+        WaitlistCommand dup = new WaitlistCommand(student, fullSection, null);
         executor.execute(dup);
         check("3.4  duplicate waitlist wasSuccessful() = false", !dup.wasSuccessful());
 
         // Second student joins at position 2
         CommandExecutor exec2 = new CommandExecutor(student2.getId());
-        WaitlistCommand wl2 = new WaitlistCommand(student2, fullSection);
+        WaitlistCommand wl2 = new WaitlistCommand(student2, fullSection, null);
         exec2.execute(wl2);
         check("3.5  student2 waitlist wasSuccessful()",      wl2.wasSuccessful());
         try {
@@ -598,7 +598,7 @@ public class Week5Test {
         }
 
         // Clean up
-        executor.execute(new DropCommand(student, section));
+        executor.execute(new DropCommand(student, section, null, null ));
     }
 
     // =========================================================================
@@ -622,7 +622,7 @@ public class Week5Test {
         header("GROUP 8 — GrantWaitlistPermissionCommand");
 
         // Put student on fullSection waitlist first
-        WaitlistCommand wlPre = new WaitlistCommand(student, fullSection);
+        WaitlistCommand wlPre = new WaitlistCommand(student, fullSection, null);
         executor.execute(wlPre);
         check("8.pre student on waitlist",                   wlPre.wasSuccessful());
 
@@ -727,8 +727,8 @@ public class Week5Test {
         check("9.13 redo on empty stack returns false",      !extraRedo);
 
         // After the redo drain above, student2 is enrolled again — drop both.
-        executor.execute(new DropCommand(student, section));
-        executor.execute(new DropCommand(student2, section));
+        executor.execute(new DropCommand(student, section, null, null ));
+        executor.execute(new DropCommand(student2, section, null, null ));
     }
 
     // =========================================================================
