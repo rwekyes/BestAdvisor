@@ -1,7 +1,8 @@
-package edu.advising.commands;
+package edu.advising.pipeline.waitlist;
 
 import edu.advising.common.PipelineHandler;
 import edu.advising.common.PipelineResult;
+import edu.advising.pipeline.registration.RegistrationContext;
 
 public class WaitlistAddHandler implements PipelineHandler<RegistrationContext> {
     @Override

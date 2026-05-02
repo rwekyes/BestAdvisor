@@ -15,6 +15,8 @@ import edu.advising.model.Section;
 import edu.advising.model.WaitlistEntry;
 import edu.advising.notifications.ObservableStudent;
 import edu.advising.permissions.PermissionTree;
+import edu.advising.pipeline.drop.DropContext;
+import edu.advising.pipeline.drop.DropPipeline;
 import edu.advising.users.Student;
 
 import java.sql.SQLException;

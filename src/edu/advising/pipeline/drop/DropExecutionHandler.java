@@ -1,8 +1,9 @@
-package edu.advising.commands;
+package edu.advising.pipeline.drop;
 
 import edu.advising.common.PipelineHandler;
 import edu.advising.common.PipelineResult;
 import edu.advising.contexts.EnrollmentContext;
+import edu.advising.pipeline.registration.RegistrationContext;
 
 import java.sql.SQLException;
 

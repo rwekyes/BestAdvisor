@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.advising.permissions.PermissionTree;
+import edu.advising.pipeline.registration.RegistrationContext;
+import edu.advising.pipeline.registration.RegistrationPipeline;
 import edu.advising.users.Student;
 
 import java.util.HashMap;

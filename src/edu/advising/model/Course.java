@@ -31,9 +31,23 @@ public class Course {
     @Column(name = "is_active")
     private boolean isActive;
     @OneToMany(targetEntity = Section.class, mappedBy = "course_id")
-    private List<Section> sections; // Cached list of available sections.
+    private List<Section> sections;
     @ManyToOne(targetEntity = Department.class, joinColumn = "department_id")
     private Department department;
+    @ManyToMany(
+            targetEntity = Course.class,
+            joinTable = "course_prerequisites",
+            joinColumn = "course_id",
+            inverseJoinColumn = "prerequisite_id"
+    )
+    private List<Course> prerequisites;
+    @ManyToMany(
+            targetEntity = Course.class,
+            joinTable = "course_corequisites",
+            joinColumn = "course_id",
+            inverseJoinColumn = "corequisite_id"
+    )
+    private List<Course> corequisites;
 
     public Course() {}
 
@@ -126,6 +140,32 @@ public class Course {
             // If the id is not set, we need to save this object to get an id to set on the list items.
             DatabaseManager.getInstance().upsert(this);
         }
+    }
+
+    public List<Course> getPrerequisites() throws SQLException {
+        if (this.prerequisites == null) {
+            this.prerequisites = DatabaseManager.getInstance().fetchManyToMany(
+                    Course.class, "course_prerequisites",
+                    "course_id", "prerequisite_id", this.id);
+        }
+        return this.prerequisites;
+    }
+
+    public void setPrerequisites(List<Course> prerequisites) {
+        this.prerequisites = prerequisites;
+    }
+
+    public List<Course> getCorequisites() throws SQLException {
+        if (this.corequisites == null) {
+            this.corequisites = DatabaseManager.getInstance().fetchManyToMany(
+                    Course.class, "course_corequisites",
+                    "course_id", "corequisite_id", this.id);
+        }
+        return this.corequisites;
+    }
+
+    public void setCorequisites(List<Course> corequisites) {
+        this.corequisites = corequisites;
     }
 
     public void setSections(List<Section> sections) throws SQLException, IllegalAccessException {

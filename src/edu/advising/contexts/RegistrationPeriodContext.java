@@ -7,6 +7,7 @@ import edu.advising.states.RegistrationState;
 import edu.advising.states.StateFactory;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 public class RegistrationPeriodContext {
 
@@ -28,19 +29,8 @@ public class RegistrationPeriodContext {
 
     // forPeriod grabs an existing registration period from the db. To actually create one in the app, it will be on the admin dashboard
     public static RegistrationPeriodContext forPeriod(String semester, int year) throws SQLException {
-        String sql = "SELECT * FROM registration_periods WHERE semester = ? AND `year` = ?";
-        RegistrationPeriod period = DatabaseManager.getInstance().fetch(sql, rs -> {
-            RegistrationPeriod p = new RegistrationPeriod();
-            p.setId(rs.getInt("id"));
-            p.setSemester(rs.getString("semester"));
-            p.setYear(rs.getInt("year"));
-            p.setOpenDate(rs.getTimestamp("open_date").toLocalDateTime());
-            p.setCloseDate(rs.getTimestamp("close_date").toLocalDateTime());
-            var late = rs.getTimestamp("late_registration_end");
-            if (late != null) p.setLateRegistrationEnd(late.toLocalDateTime());
-            p.setCurrentState(rs.getString("current_state"));
-            return p;
-        }, semester, year);
+        RegistrationPeriod period = DatabaseManager.getInstance().fetchOne(
+                RegistrationPeriod.class, Map.of("semester", semester, "year", year));
 
         if (period == null) return null; // no period configured for this semester/year view will have to handle nulls
         return new RegistrationPeriodContext(period);

@@ -1,5 +1,7 @@
-package edu.advising.commands;
+package edu.advising.pipeline.registration;
 
+import edu.advising.auth.AuthenticationContext;
+import edu.advising.auth.AuthenticationResult;
 import edu.advising.model.Enrollment;
 import edu.advising.model.Section;
 import edu.advising.notifications.ObservableStudent;
@@ -10,11 +12,13 @@ public class RegistrationContext {
     private Section section;
     private PermissionTree permissionTree;
     private Enrollment enrollment;
+    private AuthenticationResult authenticationResult;
 
-    public RegistrationContext(ObservableStudent student, Section section, PermissionTree permissionTree){
+    public RegistrationContext(ObservableStudent student, Section section, PermissionTree permissionTree, AuthenticationResult authenticationResult){
         this.student = student;
         this.section = section;
         this.permissionTree = permissionTree;
+        this.authenticationResult = authenticationResult;
     }
 
     public ObservableStudent getStudent() {
@@ -35,5 +39,9 @@ public class RegistrationContext {
 
     public void setEnrollment(Enrollment enrollment) {
         this.enrollment = enrollment;
+    }
+
+    public AuthenticationResult getAuthenticationResult() {
+        return authenticationResult;
     }
 }
