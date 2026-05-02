@@ -8,11 +8,9 @@ package edu.advising.core;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.sql.Date;
+import java.util.*;
 import java.lang.reflect.Field;
-import java.util.Optional;
 
 // TODO: Make DatabaseManager an abstract class that implements a template methods for methods like upsertAll, which use
 //  an abstract method called buildUpsertSql to implement Database specific upsert sql statements, then implement
@@ -633,13 +631,26 @@ public class DatabaseManager {
      * NOTE: ADD Command Week
      * -
      * Fetches a single record by a specific column value (e.g. id), and handles class hierarchies.
-     * TODO: Modify fetchOne to take Optional Filter parameter allowing for additional SQL Filters.
+     * Overload version takes in a map, so you can grab from multiple column values.
      */
     public <T> T fetchOne(Class<T> clazz, String idColumn, Object idValue) throws SQLException {
         String joinedFrom = buildJoinedFromClause(clazz);
         // Note: We use "t." + idColumn to ensure we target the leaf table alias
         String sql = "SELECT * FROM " + joinedFrom + " WHERE t." + idColumn + " = ? LIMIT 1";
         return fetch(sql, autoMapper(clazz), idValue);
+    }
+
+    public <T> T fetchOne(Class<T> clazz, Map<String, Object> conditions) throws SQLException {
+        String joinedFrom = buildJoinedFromClause(clazz);
+        StringBuilder where = new StringBuilder();
+        List<Object> params = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : conditions.entrySet()) {
+            if (where.length() > 0) where.append(" AND ");
+            where.append("t.").append(entry.getKey()).append(" = ?");
+            params.add(entry.getValue());
+        }
+        String sql = "SELECT * FROM " + joinedFrom + " WHERE " + where + " LIMIT 1";
+        return fetch(sql, autoMapper(clazz), params.toArray());
     }
 
     /**
@@ -992,10 +1003,17 @@ public class DatabaseManager {
             executeUpdate("CREATE TABLE IF NOT EXISTS course_prerequisites (" +
                     "course_id INT NOT NULL, " +
                     "prerequisite_id INT NOT NULL, " +
-                    "is_corequisite BOOLEAN DEFAULT FALSE, " +
+                    "minimum_grade VARCHAR(5), " +
                     "PRIMARY KEY (course_id, prerequisite_id), " +
                     "FOREIGN KEY (course_id) REFERENCES courses(id), " +
                     "FOREIGN KEY (prerequisite_id) REFERENCES courses(id))");
+
+            executeUpdate("CREATE TABLE IF NOT EXISTS course_corequisites (" +
+                    "course_id INT NOT NULL, " +
+                    "corequisite_id INT NOT NULL, " +
+                    "PRIMARY KEY (course_id, corequisite_id), " +
+                    "FOREIGN KEY (course_id) REFERENCES courses(id), " +
+                    "FOREIGN KEY (corequisite_id) REFERENCES courses(id))");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS sections (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -1065,6 +1083,15 @@ public class DatabaseManager {
                     "close_date TIMESTAMP NOT NULL, " +
                     "late_registration_end TIMESTAMP, " +
                     "current_state VARCHAR(20) NOT NULL, " +  // NOT_OPEN, OPEN, LATE, CLOSED
+                    "UNIQUE(semester, `year`))");
+
+            executeUpdate("CREATE TABLE IF NOT EXISTS grading_periods (" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "semester VARCHAR(20) NOT NULL, " +
+                    "`year` INT NOT NULL, " +
+                    "open_date TIMESTAMP NOT NULL, " +
+                    "close_date TIMESTAMP NOT NULL, " +
+                    "current_state VARCHAR(20) NOT NULL, " +  // NOT_OPEN, OPEN, CLOSED
                     "UNIQUE(semester, `year`))");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS transcript_requests (" +
@@ -1389,6 +1416,7 @@ public class DatabaseManager {
                     "('FINANCIAL_HOLD', 'REGISTER_COURSES'), " +
                     "('FINANCIAL_HOLD', 'VIEW_TRANSCRIPT'), " +
                     "('FINANCIAL_HOLD', 'ORDER_TRANSCRIPT'), " +
+                    "('ACADEMIC_HOLD', 'REGISTER_COURSES'), " +
                     "('ACADEMIC_PROBATION', 'HONORS_PROGRAMS'), " +
                     "('ACADEMIC_PROBATION', 'STUDY_ABROAD'), " +
                     "('ACADEMIC_PROBATION', 'OVERLOAD_CREDITS')");

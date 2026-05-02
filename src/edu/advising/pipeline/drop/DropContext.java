@@ -1,9 +1,10 @@
-package edu.advising.commands;
+package edu.advising.pipeline.drop;
 
 import edu.advising.model.Enrollment;
 import edu.advising.model.Section;
 import edu.advising.notifications.ObservableStudent;
 import edu.advising.permissions.PermissionTree;
+import edu.advising.pipeline.registration.RegistrationContext;
 
 // We're extending the RegistrationContext so we don't need to repeat code
 public class DropContext extends RegistrationContext {

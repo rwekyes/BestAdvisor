@@ -1,4 +1,4 @@
-package edu.advising.commands;
+package edu.advising.pipeline.registration;
 
 import edu.advising.common.PipelineHandler;
 import edu.advising.common.PipelineResult;

@@ -1,7 +1,9 @@
-package edu.advising.commands;
+package edu.advising.pipeline.drop;
 
 import edu.advising.common.PipelineHandler;
 import edu.advising.common.PipelineResult;
+import edu.advising.pipeline.registration.PermissionCheckHandler;
+import edu.advising.pipeline.registration.RegistrationContext;
 
 import java.util.List;
 
