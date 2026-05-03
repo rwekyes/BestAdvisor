@@ -1027,6 +1027,7 @@ public class DatabaseManager {
                     "room VARCHAR(50), " +
                     "delivery_method VARCHAR(50), " +
                     "status VARCHAR(20) DEFAULT 'OPEN', " +  // OPEN, CLOSED, CANCELLED
+                    "grades_finalized BOOLEAN DEFAULT FALSE, " +
                     "FOREIGN KEY (course_id) REFERENCES courses(id), " +
                     "FOREIGN KEY (faculty_id) REFERENCES faculty(id), " +
                     "UNIQUE(course_id, section_number, semester, `year`))");

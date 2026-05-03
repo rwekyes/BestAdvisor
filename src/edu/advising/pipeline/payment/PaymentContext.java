@@ -14,12 +14,19 @@ public class PaymentContext {
     private BigDecimal amount;
     private String paymentType;
     private String paymentMethod;
+    private String cardNumber;
+    private String expiryDate;
+    private String cvv;
 
-    public PaymentContext(ObservableStudent student, BigDecimal amount, String paymentType, String paymentMethod, AuthenticationResult authenticationResult){
+    public PaymentContext(ObservableStudent student, BigDecimal amount, String paymentType, String paymentMethod,
+                          String cardNumber, String expiryDate, String cvv, AuthenticationResult authenticationResult){
         this.student = student;
         this.amount = amount;
         this.paymentType = paymentType;
         this.paymentMethod = paymentMethod;
+        this.cardNumber = cardNumber;
+        this.expiryDate = expiryDate;
+        this.cvv = cvv;
         this.authenticationResult = authenticationResult;
     }
 
@@ -49,5 +56,17 @@ public class PaymentContext {
 
     public String getPaymentMethod() {
         return paymentMethod;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public String getExpiryDate() {
+        return expiryDate;
+    }
+
+    public String getCvv() {
+        return cvv;
     }
 }
