@@ -1,7 +1,7 @@
 package edu.advising.roster;
 
-import edu.advising.commands.Enrollment;
-import edu.advising.commands.Section;
+import edu.advising.model.Enrollment;
+import edu.advising.model.Section;
 import edu.advising.users.Student;
 
 import java.sql.SQLException;
@@ -35,9 +35,6 @@ public class EnrollmentDateRosterIterator implements RosterIterator{
 
     @Override
     public Student next() {
-        if (!hasNext()) {
-            System.err.println("Student Roster has no more elements");
-        }
         return sorted.get(cursor++);
     }
 
