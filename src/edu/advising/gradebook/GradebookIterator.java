@@ -1,8 +1,8 @@
-package edu.advising.schedule;
+package edu.advising.gradebook;
 
 import edu.advising.model.Enrollment;
 
-public interface ScheduleIterator {
+public interface GradebookIterator {
     boolean hasNext();
     Enrollment next();
     void reset();

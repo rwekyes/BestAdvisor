@@ -25,9 +25,6 @@ public class CreditsEarnedRosterIterator implements RosterIterator{
 
     @Override
     public Student next() {
-        if (!hasNext()) {
-            System.err.println("Student Roster has no more elements");
-        }
         return sorted.get(cursor++);
     }
 
