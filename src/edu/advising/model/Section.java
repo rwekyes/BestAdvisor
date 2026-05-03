@@ -45,6 +45,8 @@ public class Section {
     private String deliveryMethod;
     @Column(name = "status")
     private String status;  //OPEN, CLOSED, CANCELLED
+    @Column(name = "grades_finalized")
+    private boolean gradesFinalized;
     @ManyToOne(targetEntity = Course.class, joinColumn = "course_id")
     private Course course; // Cached object representing this sections courses.
     @ManyToOne(targetEntity = Faculty.class, joinColumn = "faculty_id")
@@ -296,6 +298,14 @@ public class Section {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isGradesFinalized() {
+        return gradesFinalized;
+    }
+
+    public void setGradesFinalized(boolean gradesFinalized) {
+        this.gradesFinalized = gradesFinalized;
     }
 
     @Override

@@ -15,6 +15,7 @@ public class PaymentPipeline {
     public static PaymentPipeline standard() {
         return new PaymentPipeline(List.of(
                 new PaymentAuthCheckHandler(),
+                new PaymentMethodValidationHandler(),
                 new AmountValidationHandler(),
                 new BalanceCheckHandler(),
                 new DuplicatePaymentCheckHandler(),
