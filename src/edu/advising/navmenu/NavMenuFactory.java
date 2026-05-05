@@ -7,4 +7,6 @@ public interface NavMenuFactory {
     DashboardWidget createDashboardWidget();
     NotificationPanel createNotificationPanel();
     QuickActionPanel createQuickActionsPanel();
+    ProfilePanel createProfilePanel();
+    ReportViewer createReportViewer();
 }
