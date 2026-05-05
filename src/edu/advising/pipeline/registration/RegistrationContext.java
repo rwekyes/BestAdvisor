@@ -1,6 +1,5 @@
 package edu.advising.pipeline.registration;
 
-import edu.advising.auth.AuthenticationContext;
 import edu.advising.auth.AuthenticationResult;
 import edu.advising.model.Enrollment;
 import edu.advising.model.Section;

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.advising.audit.AuditEvent;
 import edu.advising.audit.AuditLog;
 import edu.advising.audit.EventType;
+import edu.advising.auth.AuthenticationResult;
 import edu.advising.common.PipelineResult;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
@@ -51,7 +52,7 @@ public class RegisterCommand extends BaseCommand {
     @Override
     public void execute() {
         executionTime = LocalDateTime.now();
-        RegistrationContext ctx = new RegistrationContext(student, section, permissionTree);
+        RegistrationContext ctx = new RegistrationContext(student, section, permissionTree, AuthenticationResult.success(student));
 
         PipelineResult result = RegistrationPipeline.standard().run(ctx);
 
