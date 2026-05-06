@@ -20,7 +20,9 @@ public class FacultyProfilePanel implements ProfilePanel{
                 new ProfileField("Department", faculty.getDepartment(), false),
                 new ProfileField("Title", faculty.getTitle(), false),
                 new ProfileField("Office", faculty.getOfficeLocation(), false),
-                new ProfileField("Office Hours", faculty.getOfficeHours(), false)
+                new ProfileField("Office Hours", faculty.getOfficeHours(), true),
+                new ProfileField("Phone Number", faculty.getPhone(), true),
+                new ProfileField("Email", faculty.getEmail(), true)
         );
     }
 

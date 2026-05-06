@@ -10,4 +10,16 @@ public class ProfileField {
         this.value = value;
         this.editable = editable;
     }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
 }
