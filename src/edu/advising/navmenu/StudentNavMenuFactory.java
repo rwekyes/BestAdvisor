@@ -45,4 +45,14 @@ public class StudentNavMenuFactory implements NavMenuFactory{
     public QuickActionPanel createQuickActionsPanel() {
         return new StudentQuickActionsPanel();
     }
+
+    @Override
+    public ProfilePanel createProfilePanel() {
+        return null;
+    }
+
+    @Override
+    public ReportViewer createReportViewer() {
+        return null;
+    }
 }

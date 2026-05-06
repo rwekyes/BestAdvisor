@@ -44,6 +44,8 @@ public class Student extends User {
     @OneToMany(targetEntity = WaitlistEntry.class, mappedBy = "student_id")
     private List<WaitlistEntry> waitlist;
 
+    private Faculty advisor;
+
     public Student() {}
 
     public Student(String username, String password, String email,
@@ -182,5 +184,13 @@ public class Student extends User {
         // Now let's upsertAll of these list items (i.e. a batch) and set as this object's related field.
         DatabaseManager.getInstance().upsertAll(waitlist);
         this.waitlist = waitlist;
+    }
+
+    public Faculty getAdvisor() throws SQLException {
+        if (this.advisor == null) {
+            this.advisor = DatabaseManager.getInstance()
+                    .fetchOne(Faculty.class, "id", this.advisorId);
+        }
+        return (this.advisor != null) ? this.advisor : null;
     }
 }
