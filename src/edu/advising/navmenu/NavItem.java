@@ -10,4 +10,15 @@ public class NavItem {
         this.iconPath = iconPath;
     }
 
+    public String getLabel() {
+        return label;
+    }
+
+    public String getSceneKey() {
+        return sceneKey;
+    }
+
+    public String getIconPath() {
+        return iconPath;
+    }
 }
