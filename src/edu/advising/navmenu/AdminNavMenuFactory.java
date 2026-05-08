@@ -34,4 +34,14 @@ public class AdminNavMenuFactory implements NavMenuFactory{
     public QuickActionPanel createQuickActionsPanel() {
         return null;
     }
+
+    @Override
+    public ProfilePanel createProfilePanel() {
+        return null;
+    }
+
+    @Override
+    public ReportViewer createReportViewer() {
+        return null;
+    }
 }
