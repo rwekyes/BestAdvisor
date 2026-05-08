@@ -107,10 +107,6 @@ public class BestAdvisorApp extends Application {
                 }
         );
 
-        window.setScene(mainScene);
-        window.show();
-
-
 
     }
 }
