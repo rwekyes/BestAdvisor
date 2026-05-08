@@ -1,5 +1,6 @@
 package edu.advising.pipeline.drop;
 
+import edu.advising.auth.AuthenticationResult;
 import edu.advising.model.Enrollment;
 import edu.advising.model.Section;
 import edu.advising.notifications.ObservableStudent;
@@ -12,7 +13,7 @@ public class DropContext extends RegistrationContext {
 
     public DropContext(ObservableStudent student, Section section,
                        PermissionTree permissionTree, Enrollment enrollment, String dropReason) {
-        super(student, section, permissionTree);
+        super(student, section, permissionTree, AuthenticationResult.success(student));
         setEnrollment(enrollment); // enrollment field already exists in parent
         this.dropReason = dropReason;
     }
