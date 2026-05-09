@@ -1,18 +1,12 @@
 package edu.advising.ui;
-import javafx.event.EventHandler;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.PopupControl;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.stage.WindowEvent;
-import java.text.BreakIterator;
 
 public class BestAdvisorApp extends Application {
 
@@ -23,7 +17,7 @@ public class BestAdvisorApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        window = primaryStage;
+        Stage window = primaryStage;
 
         window.setTitle("Best Advisor");
         window.initStyle(StageStyle.DECORATED);
@@ -49,8 +43,7 @@ public class BestAdvisorApp extends Application {
         Button studentButton = new Button("Student");
         Button advisorButton = new Button("Advisor");
 
-        VBox layout = new VBox(15);
-        layout.getChildren().addAll(
+        navigationPanel.getChildren().addAll(
                 navTitle,
                 dashboardButton,
                 studentButton,
@@ -107,6 +100,7 @@ public class BestAdvisorApp extends Application {
                 }
         );
 
-
+        window.setScene(mainScene);
+        window.show();
     }
 }
