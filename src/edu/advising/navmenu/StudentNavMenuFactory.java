@@ -48,11 +48,11 @@ public class StudentNavMenuFactory implements NavMenuFactory{
 
     @Override
     public ProfilePanel createProfilePanel() {
-        return null;
+        return new StudentProfilePanel(this.student);
     }
 
     @Override
     public ReportViewer createReportViewer() {
-        return null;
+        return new StudentReportViewer();
     }
 }

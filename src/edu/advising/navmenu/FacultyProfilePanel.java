@@ -28,6 +28,12 @@ public class FacultyProfilePanel implements ProfilePanel{
 
     @Override
     public void render() {
-
+        System.out.println("--- Your Profile ---");
+        for (ProfileField f : getFields()) {
+            System.out.printf("  %-18s %s%s%n",
+                    f.getLabel() + ":",
+                    f.getValue() != null ? f.getValue() : "—",
+                    f.isEditable() ? "  [editable]" : "");
+        }
     }
 }

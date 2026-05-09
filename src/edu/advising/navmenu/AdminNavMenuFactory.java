@@ -42,6 +42,6 @@ public class AdminNavMenuFactory implements NavMenuFactory{
 
     @Override
     public ReportViewer createReportViewer() {
-        return null;
+        return new AdminReportViewer();
     }
 }

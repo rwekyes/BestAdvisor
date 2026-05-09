@@ -59,7 +59,13 @@ public class GuestViewState implements ViewState {
 
     @Override
     public void render(ViewContext viewContext) {
-
+        System.out.println();
+        System.out.println("  ================================================");
+        System.out.println("         BetterAdvisor  —  Advising System");
+        System.out.println("  ================================================");
+        System.out.println();
+        System.out.println("    [l] Login");
+        System.out.println("    [q] Quit");
     }
 
     @Override

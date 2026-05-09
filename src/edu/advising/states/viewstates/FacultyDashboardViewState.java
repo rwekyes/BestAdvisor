@@ -1,7 +1,11 @@
 package edu.advising.states.viewstates;
 
 import edu.advising.contexts.ViewContext;
+import edu.advising.navmenu.*;
 import edu.advising.states.ViewState;
+import edu.advising.users.Faculty;
+
+import java.util.List;
 
 public class FacultyDashboardViewState implements ViewState {
 
@@ -38,7 +42,23 @@ public class FacultyDashboardViewState implements ViewState {
 
     @Override
     public void render(ViewContext viewContext) {
-        viewContext.getCurrentUser().showDashboard();
+        Faculty faculty = (Faculty) viewContext.getCurrentUser();
+        System.out.println();
+        new FacultyDashboardWidget(faculty).render();
+        System.out.println();
+        new FacultyProfilePanel(faculty).render();
+        System.out.println();
+        new FacultyNotificationPanel().render();
+        System.out.println();
+        new FacultyQuickActionsPanel().render();
+        System.out.println();
+        System.out.println("--- Navigation ---");
+        List<NavItem> items = FacultyNavMenuFactory.facultyItems();
+        for (int i = 0; i < items.size(); i++) {
+            System.out.printf("  %2d. %s%n", i + 1, items.get(i).getLabel());
+        }
+        System.out.println();
+        System.out.println("  Shortcuts: [p] Permission To Add  [l] Logout  [b] Back  [q] Quit");
     }
 
     @Override

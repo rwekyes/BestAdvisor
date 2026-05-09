@@ -15,6 +15,7 @@ public class StudentQuickActionsPanel implements QuickActionPanel{
 
     @Override
     public void render() {
-
+        System.out.println("--- Quick Actions ---");
+        getButtons().forEach(b -> System.out.println("  • " + b.getLabel()));
     }
 }
