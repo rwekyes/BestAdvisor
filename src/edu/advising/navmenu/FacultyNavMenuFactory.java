@@ -44,11 +44,11 @@ public class FacultyNavMenuFactory implements NavMenuFactory{
 
     @Override
     public ProfilePanel createProfilePanel() {
-        return null;
+        return new FacultyProfilePanel(this.faculty);
     }
 
     @Override
     public ReportViewer createReportViewer() {
-        return null;
+        return new FacultyReportViewer();
     }
 }

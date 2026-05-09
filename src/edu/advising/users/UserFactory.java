@@ -109,6 +109,17 @@ public class UserFactory {
                                 rs.getString("employee_id"),
                                 rs.getString("department")
                         );
+                    } else if ("ADMIN".equals(userType)) {
+                        Admin admin = new Admin(
+                                rs.getString("username"),
+                                rs.getString("password"),
+                                rs.getString("email"),
+                                rs.getString("s_fname"),
+                                rs.getString("s_lname")
+                        );
+                        admin.setEmployeeId(rs.getInt("a_employee_id"));
+                        admin.setAccessLevel(rs.getString("access_level"));
+                        user = admin;
                     }
 
                     if (user != null) {
@@ -129,10 +140,11 @@ public class UserFactory {
     public User getUserById(int userId) {
         String sql = "SELECT u.*, u.first_name as s_fname, u.last_name as s_lname, " +
                 "s.student_id, s.gpa, u.first_name as f_fname, u.last_name as f_lname, " +
-                "f.employee_id, f.department " +
+                "f.employee_id, f.department, a.employee_id as a_employee_id, a.access_level " +
                 "FROM users u " +
                 "LEFT JOIN students s ON u.id = s.id " +
                 "LEFT JOIN faculty f ON u.id = f.id " +
+                "LEFT JOIN admins a ON u.id = a.id " +
                 "WHERE u.id = ?";
         return this.getUserByParam(sql, String.valueOf(userId));
     }
@@ -143,10 +155,11 @@ public class UserFactory {
     public User getUserByUsername(String username) {
         String sql = "SELECT u.*, u.first_name as s_fname, u.last_name as s_lname, " +
                 "s.student_id, s.gpa, u.first_name as f_fname, u.last_name as f_lname, " +
-                "f.employee_id, f.department " +
+                "f.employee_id, f.department, a.employee_id as a_employee_id, a.access_level " +
                 "FROM users u " +
                 "LEFT JOIN students s ON u.id = s.id " +
                 "LEFT JOIN faculty f ON u.id = f.id " +
+                "LEFT JOIN admins a ON u.id = a.id " +
                 "WHERE u.username = ?";
         return this.getUserByParam(sql, username);
     }

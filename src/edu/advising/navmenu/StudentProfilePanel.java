@@ -30,6 +30,16 @@ public class StudentProfilePanel implements ProfilePanel{
 
     @Override
     public void render() {
-
+        System.out.println("--- Your Profile ---");
+        try {
+            for (ProfileField f : getFields()) {
+                System.out.printf("  %-18s %s%s%n",
+                        f.getLabel() + ":",
+                        f.getValue() != null ? f.getValue() : "—",
+                        f.isEditable() ? "  [editable]" : "");
+            }
+        } catch (Exception e) {
+            System.out.println("  (profile unavailable)");
+        }
     }
 }

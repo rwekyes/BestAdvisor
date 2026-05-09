@@ -26,6 +26,7 @@ public class BasicAuthentication implements AuthenticationStrategy {
             return dbManager.executeQuery(sql, rs -> {
                 if (rs.next() && rs.getString("password").equals(password)) {
                     User user = userFactory.getUserByUsername(username);
+                    if (user == null) return AuthenticationResult.failed("User record not found");
                     return AuthenticationResult.success(user);
                 }
                 return AuthenticationResult.failed("Invalid credentials");

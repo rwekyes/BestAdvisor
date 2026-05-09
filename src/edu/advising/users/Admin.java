@@ -12,6 +12,18 @@ public class Admin extends User{
     @Column(name = "access_level")
     private String accessLevel;
 
+    public Admin() {}
+
+    public Admin(String username, String password, String email, String firstName, String lastName) {
+        super(username, password, email, firstName, lastName);
+        this.userType = "ADMIN";
+    }
+
+    public void setEmployeeId(int employeeId) { this.employeeId = employeeId; }
+    public int getEmployeeId() { return employeeId; }
+    public void setAccessLevel(String accessLevel) { this.accessLevel = accessLevel; }
+    public String getAccessLevel() { return accessLevel; }
+
     @Override
     public void showDashboard() {
         System.out.println("\n=== ADMIN DASHBOARD ==="); //TODO: When the UI gets made, this is going to be submenus, for now I'm using it as a running list

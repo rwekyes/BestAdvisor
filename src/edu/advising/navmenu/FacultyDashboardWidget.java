@@ -12,7 +12,11 @@ public class FacultyDashboardWidget implements DashboardWidget{
 
     @Override
     public void render() {
-
+        System.out.println("=== Faculty Dashboard ===");
+        System.out.printf("  Welcome, %s%n", faculty.getFullName());
+        System.out.printf("  Dept: %-22s  Office: %s%n",
+                faculty.getDepartment() != null ? faculty.getDepartment() : "—",
+                faculty.getOfficeLocation() != null ? faculty.getOfficeLocation() : "—");
     }
 
     @Override

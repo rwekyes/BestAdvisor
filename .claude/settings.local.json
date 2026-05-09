@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C .claude/worktrees/awesome-dirac-1b8d08 log --oneline)",
+      "Bash(git -C .claude/worktrees/crazy-bell-7ef948 log --oneline)",
+      "Bash(git -C .claude/worktrees/condescending-wu-8f11eb status --short)",
+      "Bash(git -C .claude/worktrees/unruffled-hoover-34ca3e status --short)",
+      "Bash(grep -B1 \"^--$\\\\|render.*{$\")",
+      "Bash(grep -v \"^--$\")",
+      "Bash(xargs grep *)",
+      "Bash(xargs cat *)",
+      "Bash(mvn compile *)"
+    ]
+  }
+}

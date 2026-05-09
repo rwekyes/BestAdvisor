@@ -19,6 +19,7 @@ public class FacultyNotificationPanel implements NotificationPanel{
 
     @Override
     public void render() {
-
+        System.out.println("--- Notifications ---");
+        getFilteredTypes().forEach(t -> System.out.println("  • " + t));
     }
 }

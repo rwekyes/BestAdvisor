@@ -149,7 +149,7 @@ public class Enrollment {
         if (this.section == null) {
             // Lazy Load: Use the generic fetchOne from DatabaseManager
             this.section = DatabaseManager.getInstance()
-                    .fetchOne(Section.class, "section_id", this.sectionId);
+                    .fetchOne(Section.class, "id", this.sectionId);
         }
         return (this.section != null) ? this.section : null;
     }
