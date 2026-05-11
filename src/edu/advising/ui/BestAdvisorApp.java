@@ -1,12 +1,14 @@
 package edu.advising.ui;
 import javafx.application.Application;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.geometry.Insets;
+import javafx.fxml.FXMLLoader;
 
 public class BestAdvisorApp extends Application {
 
@@ -54,27 +56,24 @@ public class BestAdvisorApp extends Application {
 
         // Top Bar
 
-        HBox topbar = new HBox();
-        topbar.setPadding( new Insets(15));
-        Label appTitle = new Label("Welcome to WebAdvisor!");
+        FXMLLoader loader =
+                new FXMLLoader(getClass().getResource("/views/TopBar.fxml"));
 
-        topbar.getChildren().add(appTitle);
-
-        root.setTop(topbar);
+        HBox topBar = loader.load();
 
         // ContentArea ContentArea ContentArea
-        StackPane ContentArea = new StackPane();
-        Label ContentLabel = new Label("Content: WebAdvisor!"); //Changing the text to something else
+        StackPane contentArea = new StackPane();
+        Label contentLabel = new Label("Content: WebAdvisor!"); //Changing the text to something else
 
         Button switchButton = new Button("Test");
 
         VBox centerLayout = new VBox(20);
         centerLayout.setPadding(new Insets(20));
-        centerLayout.getChildren().addAll(ContentLabel, switchButton);
+        centerLayout.getChildren().addAll(contentLabel, switchButton);
 
-        ContentArea.getChildren().addAll(centerLayout);
+        contentArea.getChildren().addAll(centerLayout);
 
-        root.setCenter(ContentArea);
+        root.setCenter(contentArea);
 
         // StatusBar StatusBar StatusBar StatusBar
         HBox statusBar = new HBox(25);
@@ -96,7 +95,7 @@ public class BestAdvisorApp extends Application {
         Scene mainScene = new Scene(root, 1200, 800);
 
         switchButton.setOnAction(e -> {
-                    ContentLabel.setText("SceneManager swapped content!");
+                    contentLabel.setText("SceneManager swapped content!");
                 }
         );
 
