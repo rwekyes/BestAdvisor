@@ -3,6 +3,8 @@ package edu.advising.users;
 import edu.advising.core.DatabaseManager;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * UserFactory - Factory Pattern Implementation
@@ -34,6 +36,12 @@ public class UserFactory {
                     user = new Faculty(username, password, email, firstName, lastName,
                             additionalInfo[0], // employeeId
                             additionalInfo[1]); // department
+                }
+                break;
+            case "ADMIN":
+                user = new Admin(username, password, email, firstName, lastName);
+                if (additionalInfo.length >= 1) {
+                    ((Admin) user).setAccessLevel(additionalInfo[0]);
                 }
                 break;
             default:
@@ -69,6 +77,10 @@ public class UserFactory {
                 Faculty faculty = (Faculty) user;
                 String facultySql = "INSERT INTO faculty (id, employee_id, department) VALUES (?, ?, ?)";
                 dbManager.executeUpdate(facultySql, user.getId(), faculty.getEmployeeId(), faculty.getDepartment());
+            } else if (user instanceof Admin) {
+                Admin admin = (Admin) user;
+                String adminSql = "INSERT INTO admins (id, employee_id, access_level) VALUES (?, ?, ?)";
+                dbManager.executeUpdate(adminSql, user.getId(), admin.getEmployeeId(), admin.getAccessLevel());
             }
 
             System.out.println("User created successfully with ID: " + user.getId());
@@ -147,6 +159,47 @@ public class UserFactory {
                 "LEFT JOIN admins a ON u.id = a.id " +
                 "WHERE u.id = ?";
         return this.getUserByParam(sql, String.valueOf(userId));
+    }
+
+    /**
+     * Returns a flat list of all users (base fields only) — used for the admin table view.
+     */
+    public List<User> getAllUsers() throws SQLException {
+        String sql = "SELECT id, username, user_type, first_name, last_name, " +
+                     "email, phone, is_active FROM users ORDER BY last_name, first_name";
+        return dbManager.executeQuery(sql, rs -> {
+            List<User> result = new ArrayList<>();
+            while (rs.next()) {
+                User u = new User();
+                u.setId(rs.getInt("id"));
+                u.setUsername(rs.getString("username"));
+                u.setUserType(rs.getString("user_type"));
+                u.setFirstName(rs.getString("first_name"));
+                u.setLastName(rs.getString("last_name"));
+                u.setEmail(rs.getString("email"));
+                u.setPhone(rs.getString("phone"));
+                u.setActive(rs.getBoolean("is_active"));
+                result.add(u);
+            }
+            return result;
+        });
+    }
+
+    /**
+     * Returns the fully-typed user object (Student / Faculty / Admin) for editing.
+     * Uses the ORM's fetchOne so all annotated fields — including subtype fields — are populated.
+     */
+    public User getTypedUser(int id) throws SQLException {
+        String typeSql = "SELECT user_type FROM users WHERE id = ?";
+        String userType = dbManager.executeQuery(typeSql,
+                rs -> rs.next() ? rs.getString(1) : null, id);
+        if (userType == null) return null;
+        return switch (userType) {
+            case "STUDENT" -> dbManager.fetchOne(Student.class, "id", id);
+            case "FACULTY" -> dbManager.fetchOne(Faculty.class, "id", id);
+            case "ADMIN"   -> dbManager.fetchOne(Admin.class,   "id", id);
+            default        -> dbManager.fetchOne(User.class,    "id", id);
+        };
     }
 
     /**

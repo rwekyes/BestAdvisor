@@ -35,6 +35,8 @@ public class MacroCommand extends BaseCommand {
         commands.add(command);
     }
 
+    public int getCommandCount() { return commands.size(); }
+
     public static MacroCommand fromSuperType(BaseCommand base) {
         MacroCommand cmd = new MacroCommand();
         BaseCommand.copyBaseFields(base, cmd);

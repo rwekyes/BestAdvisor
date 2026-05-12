@@ -139,6 +139,8 @@ public class User {
     public void setUserType(String userType)      { this.userType = userType; }
     public void setActive(Boolean isActive)     { this.isActive = isActive; }
     public void setLastLogin(LocalDateTime lastLogin) { this.lastLogin = lastLogin; }
-    public void setPhone(String phone)            { this.phone = phone; }
-    public void setUpdatedAt(LocalDateTime ts)    { this.updatedAt = ts; }
+    public void setUsername(String username)       { this.username = username; }
+    public void setPassword(String password)       { this.password = password; }
+    public void setPhone(String phone)             { this.phone = phone; }
+    public void setUpdatedAt(LocalDateTime ts)     { this.updatedAt = ts; }
 }
