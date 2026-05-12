@@ -88,7 +88,7 @@ public class BestAdvisorApp extends Application {
                 sessionTime,
                 messages
         );
-
+        root.setTop(topBar);
         root.setBottom(statusBar);
         // Finishing stuff
 
