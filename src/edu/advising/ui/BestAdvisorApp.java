@@ -90,6 +90,18 @@ public class BestAdvisorApp extends Application {
         );
         root.setTop(topBar);
         root.setBottom(statusBar);
+
+        // Navigation Panel
+
+        FXMLLoader navLoader =
+                new FXMLLoader(
+                        getClass().getResource("/views/NavigationPanel.fxml")
+                );
+
+        navigationPanel = navLoader.load();
+
+        root.setLeft(navigationPanel);
+
         // Finishing stuff
 
         Scene mainScene = new Scene(root, 1200, 800);
@@ -101,5 +113,6 @@ public class BestAdvisorApp extends Application {
 
         window.setScene(mainScene);
         window.show();
+
     }
 }

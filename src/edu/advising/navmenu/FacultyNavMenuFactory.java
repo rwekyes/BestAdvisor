@@ -8,6 +8,11 @@ import java.util.List;
 public class FacultyNavMenuFactory implements NavMenuFactory{
     private final Faculty faculty;
 
+    public FacultyNavMenuFactory() {
+
+        faculty = null;
+    }
+
     public static List<NavItem> facultyItems() {
         return List.of(
                 new NavItem("My Schedule", "SCHEDULE", NavIcons.ICON_NAV),
@@ -50,5 +55,10 @@ public class FacultyNavMenuFactory implements NavMenuFactory{
     @Override
     public ReportViewer createReportViewer() {
         return new FacultyReportViewer();
+    }
+
+    @Override
+    public NavItem createMenu() {
+        return null;
     }
 }

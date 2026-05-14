@@ -9,4 +9,6 @@ public interface NavMenuFactory {
     QuickActionPanel createQuickActionsPanel();
     ProfilePanel createProfilePanel();
     ReportViewer createReportViewer();
+
+    NavItem createMenu();
 }

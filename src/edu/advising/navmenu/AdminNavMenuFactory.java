@@ -44,4 +44,9 @@ public class AdminNavMenuFactory implements NavMenuFactory{
     public ReportViewer createReportViewer() {
         return new AdminReportViewer();
     }
+
+    @Override
+    public NavItem createMenu() {
+        return null;
+    }
 }
